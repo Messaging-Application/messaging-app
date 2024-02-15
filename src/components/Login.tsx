@@ -17,7 +17,7 @@ const Login: React.FC = () => {
     setPassword(event.target.value);
   };
 
-  const submitHandler = async (event: React.FormEvent<HTMLFormElement>) => {
+  const submitHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
 
     // const body = {

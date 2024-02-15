@@ -1,0 +1,8 @@
+node_modules
+.github
+LICENSE
+README.md
+.husky
+.git
+package.json
+package-lock.json

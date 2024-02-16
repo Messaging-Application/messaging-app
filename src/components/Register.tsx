@@ -1,6 +1,7 @@
 import '../index.css'
 
 import { useState } from "react";
+import React from 'react';
 
 const Register: React.FC = () => {
   // const { setUser } = useContext(UserContext);

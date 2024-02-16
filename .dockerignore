@@ -1,0 +1,12 @@
+.eslintignore
+.eslintrc.cjs
+.git
+.github
+.gitignore
+.husky
+babel.config.ts
+jest.config.ts
+tailwind.config.ts
+tsconfig.json
+tsconfig.node.json
+vite.config.ts

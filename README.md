@@ -28,3 +28,17 @@ export default {
 - Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
 - Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
 - Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+
+## Run Application
+```npm run dev```
+## Run Unit Tests
+```npm run test```
+## Run Lint
+```npm run lint```
+## Using Docker
+### Build Docker Image
+```docker build -t messagging_app .```
+### Run Docker container
+```docker run -it -p 5173:5173 -host=172.17.0.2 messagging_app:latest```
+### Docker-compose
+```docker-compose up```

@@ -1,0 +1,9 @@
+version: "3"
+services:
+  messaging_app:
+    image: messaging_app
+    build:
+      context: ./
+    ports:
+      - 5173:5173
+    container_name: messaging_app

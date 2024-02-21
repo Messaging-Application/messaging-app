@@ -1,5 +1,7 @@
 import { render, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom'
+import fetchMock from 'jest-fetch-mock';
+fetchMock.enableMocks();
 
 import Login from '../components/Login';
 

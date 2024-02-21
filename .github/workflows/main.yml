@@ -6,6 +6,10 @@ on:
   pull_request:
     branches:
       - "**"
+env:
+  IMAGE_NAME: messaging_app
+  # REPO_NAME: 
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -17,3 +21,11 @@ jobs:
         node-version: 20
     - run: npm install
     - run: npm run lint
+    - run: npm run test
+    - name: Build docker image
+      run: |
+        docker build . -t $IMAGE_NAME
+    - name: Run docker container
+      run: |
+        docker run -d -e 5173:5173 -host=172.17.0.2 $IMAGE_NAME:latest && \
+          docker ps && sleep 5

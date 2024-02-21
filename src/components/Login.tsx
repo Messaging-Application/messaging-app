@@ -2,13 +2,14 @@ import '../index.css'
 
 import { useState } from "react";
 import React from 'react';
+// import { UserContext } from "./UserProvider";
 
 const Login: React.FC = () => {
   // const { setUser } = useContext(UserContext);
 
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  // const [errorMessage, setErrorMessage] = useState<string>("");
+  const [errorMessage, setErrorMessage] = useState<string>("");
 
   const usernameChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
     setUsername(event.target.value);
@@ -20,26 +21,40 @@ const Login: React.FC = () => {
 
   const submitHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
-
-    // const body = {
-    //   username,
-    //   password,
-    // };
-    // console.log(body);
-    // fetch("https://localhost:5000/auth/login", {
-    //   method: "POST",
-    //   headers: { "Content-Type": "application/json" },
-    //   body: JSON.stringify(body),
-    // })
-    // .then((response) => {
-    //   if (!response.ok) {
-    //     throw new Error("Failed to log in");
-    //   }
-    //   // Handle success
-    // })
-    // .catch((err) => {
-    //   console.error(err.message);
-    // });
+    setErrorMessage("");
+      if (username && password) {
+        const body = {
+          username,
+          password,
+        };
+        console.log(body);
+        fetch("http://localhost:8080/auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        })
+        .then((response) => {
+          console.log('Response status code:', response.status); 
+          if (!response.ok) {
+            setErrorMessage("Wrong credentials");
+            throw new Error("Failed to log in");
+          }
+          console.log(response);
+          window.location.href = "/profile";
+          // Parse JSON response
+          // return response.json();
+        })
+        // .then((userData) => {
+        //   // Handle success
+        //   setUser(userData);
+        //   console.log(userData);
+        //   // Redirect user to profile page
+        //   window.location.href = "/profile";
+        // })
+        .catch((err) => {
+          console.error(err.message);
+        });
+    }
   };
 
   function togglePassword() {
@@ -69,11 +84,11 @@ const Login: React.FC = () => {
         </div>
 
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-            {/* {errorMessage !== "" && (
+            {errorMessage !== "" && (
               <span id="message" style={{ color: "#AA0000", fontSize: "14px", display: "block", textAlign: "center" }}>
                 {errorMessage}
               </span>
-            )} */}
+            )} 
           <form className="space-y-6" action="#" method="POST">
             <div>
               <label htmlFor="username" className="block text-sm font-medium leading-6 text-gray-900">

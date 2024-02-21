@@ -2,19 +2,31 @@ import '../index.css'
 
 import { useState } from "react";
 import React from 'react';
+// import { UserContext } from "./UserProvider";
 
 const Register: React.FC = () => {
   // const { setUser } = useContext(UserContext);
 
   const [username, setUsername] = useState<string>("");
+  const [firstname, setFirstname] = useState<string>("");
+  const [lastname, setLastname] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [confirm, setConfirm] = useState<string>("");
-  // const [errorMessage, setErrorMessage] = useState<string>("");
+  const [errorMessage, setErrorMessage] = useState<string>("");
 
   const usernameChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
     setUsername(event.target.value);
   };
-
+  const firstnameChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setFirstname(event.target.value);
+  };
+  const lastnameChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setLastname(event.target.value);
+  };
+  const emailChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setEmail(event.target.value);
+  };
   const passwordChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
     setPassword(event.target.value);
   };
@@ -25,33 +37,41 @@ const Register: React.FC = () => {
 
   const submitHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
-
-    // const body = {
-    //   username,
-    //   password,
-    //   confirm,
-    // };
-
-    // if (confirm != password) {
-    //   setErrorMessage("Passwords don't match!");
-    // } else {
-    //   setErrorMessage("");
-    // }
-    // console.log(body);
-    // fetch("https://localhost:5000/auth/register", {
-    //   method: "POST",
-    //   headers: { "Content-Type": "application/json" },
-    //   body: JSON.stringify(body),
-    // })
-    // .then((response) => {
-    //   if (!response.ok) {
-    //     throw new Error("Failed to register");
-    //   }
-    //   // Handle success
-    // })
-    // .catch((err) => {
-    //   console.error(err.message);
-    // });
+    setErrorMessage("");
+    if (!username || !password || !confirm || !email || !firstname || !lastname) {
+      setErrorMessage("Please fill all the fields");
+    } else if (confirm != password) {
+      setErrorMessage("Passwords don't match");
+    } else {
+      const body = {
+        username,
+        password,
+        confirm,
+        email,
+        firstname,
+        lastname
+      };
+      console.log(body);
+      fetch("http://localhost:8080/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      })
+      .then((response) => {
+        console.log('Response status code:', response.status); 
+        if (!response.ok) {
+          setErrorMessage("User already exists");
+          throw new Error("Failed to register");
+        }
+        // Handle success
+        // setUser(body);
+        // Redirect user to profile page
+        window.location.href = "/profile";
+      })
+      .catch((err) => {
+        console.error(err.message);
+      });
+    }
   };
 
   function togglePassword() {
@@ -89,11 +109,11 @@ const Register: React.FC = () => {
         </div>
 
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-            {/* {errorMessage !== "" && (
+            {errorMessage !== "" && (
               <span id="message" style={{ color: "#AA0000", fontSize: "14px", display: "block", textAlign: "center" }}>
                 {errorMessage}
               </span>
-            )} */}
+            )} 
           <form className="space-y-6" action="#" method="POST">
             <div>
               <label htmlFor="username" className="block text-sm font-medium leading-6 text-gray-900">
@@ -109,6 +129,71 @@ const Register: React.FC = () => {
                   autoComplete="username"
                   required
                   placeholder="Enter username"
+                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                />
+              </div>
+            </div>
+
+            <div style={{ display: 'flex' }}>
+
+            <div style={{ width: '50%' }}>
+
+                <label htmlFor="firstname" className="block text-sm font-medium leading-6 text-gray-900">
+                  Firstname
+                </label>
+                <div className="mt-2">
+                  <input
+                    id="firstname"
+                    name="firstname"
+                    type="text"
+                    value={firstname}
+                    onChange={firstnameChangeHandler}
+                    autoComplete="firstname"
+                    required
+                    placeholder="Enter firstname"
+                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  />
+                </div>
+                </div>
+            <div style={{ width: '50%'}}>
+
+
+                <label htmlFor="lastname" className="block text-sm font-medium leading-6 text-gray-900">
+                  Lastname
+                </label>
+                <div className="mt-2">
+                  <input
+                    id="lastname"
+                    name="lastname"
+                    type="text"
+                    value={lastname}
+                    onChange={lastnameChangeHandler}
+                    autoComplete="lastname"
+                    required
+                    placeholder="Enter lastname"
+                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  />
+                </div>
+                </div>
+
+            </div>
+
+            <div>
+              <div className="flex items-center justify-between">
+                <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">
+                  Email
+                </label>
+              </div>
+              <div className="mt-2">
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  value={email}
+                  onChange={emailChangeHandler}
+                  autoComplete="email"
+                  required
+                  placeholder="Enter email"
                   className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 />
               </div>

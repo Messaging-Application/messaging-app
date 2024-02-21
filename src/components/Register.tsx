@@ -46,7 +46,6 @@ const Register: React.FC = () => {
       const body = {
         username,
         password,
-        confirm,
         email,
         firstname,
         lastname

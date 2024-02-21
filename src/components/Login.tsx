@@ -36,8 +36,7 @@ const Login: React.FC = () => {
         .then((response) => {
           console.log('Response status code:', response.status); 
           if (!response.ok) {
-            setErrorMessage("Wrong credentials");
-            throw new Error("Failed to log in");
+            throw new Error("Failed to login");
           }
           console.log(response);
           window.location.href = "/profile";
@@ -53,6 +52,7 @@ const Login: React.FC = () => {
         // })
         .catch((err) => {
           console.error(err.message);
+          setErrorMessage(err.message);
         });
     }
   };

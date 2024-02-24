@@ -2,6 +2,13 @@ import '../index.css'
 
 import { useState } from "react";
 import React from 'react';
+import { 
+  validateEmail, 
+  validatePassword,  
+  validateUsername,  
+  passwordsMatch,
+  validateName,  
+} from "../utils";
 // import { UserContext } from "./UserProvider";
 
 const Register: React.FC = () => {
@@ -38,11 +45,15 @@ const Register: React.FC = () => {
   const submitHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     setErrorMessage("");
-    if (!username || !password || !confirm || !email || !firstname || !lastname) {
-      setErrorMessage("Please fill all the fields");
-    } else if (confirm != password) {
-      setErrorMessage("Passwords don't match");
-    } else {
+
+    try {
+      validateUsername(username);
+      validateName(firstname);
+      validateName(lastname);
+      validateEmail(email);
+      validatePassword(password); 
+      passwordsMatch(password, confirm);
+      // if no errors
       const body = {
         username,
         password,
@@ -70,7 +81,13 @@ const Register: React.FC = () => {
       .catch((err) => {
         console.error(err.message);
       });
+
+    } catch (error: unknown) {
+      // Handle the error
+      console.error('An error occurred:', error.message);
+      setErrorMessage(error.message);
     }
+
   };
 
   function togglePassword() {

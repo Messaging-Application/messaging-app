@@ -9,6 +9,7 @@ import {
   Login,
   Register,
   UserProvider,
+  Profile,
   // UserContext,
 } from "./components";
 const router = createBrowserRouter([
@@ -22,8 +23,8 @@ const router = createBrowserRouter([
     element: <Register/>,
   },
   {
-    path: "/profile",
-    element: <p>profile</p>,
+    path: "/chat",
+    element: <Profile/>,
   },
 ]);
 

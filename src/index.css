@@ -63,3 +63,12 @@ button:focus-visible {
   color: #4f46e5;
   border-color: #4f46e5;
 }
+
+.fade-in {
+  color: rgba(0, 0, 0, 0.3); /* Adjust the opacity value (0.3 in this case) */
+  transition: color 0.5s ease-in-out;
+}
+
+.fade-in:hover {
+  color: black; /* Change to the color you want */
+}

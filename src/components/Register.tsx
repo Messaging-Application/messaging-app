@@ -82,7 +82,7 @@ const Register: React.FC = () => {
         console.error(err.message);
       });
 
-    } catch (error: unknown) {
+    } catch (error: any) {
       // Handle the error
       console.error('An error occurred:', error.message);
       setErrorMessage(error.message);

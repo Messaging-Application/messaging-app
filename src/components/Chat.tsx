@@ -1,4 +1,3 @@
-
 import '../index.css'
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -10,7 +9,7 @@ import {
   ChatHeaderProps,
 } from "../types";
 
-const Chat = ({ socket }: ChatProps) => {
+const Chat: React.FC<ChatProps> = ({ socket }) => {
   const [showProfile, setShowProfile] = useState<boolean>(false);
   const [messages, setMessages] = useState<MessageData[]>([]);
   const lastMessageRef = useRef<HTMLDivElement>(null);

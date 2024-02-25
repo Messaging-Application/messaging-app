@@ -57,7 +57,7 @@ const Login: React.FC = () => {
     }
   };
 
-  function togglePassword() {
+  const togglePassword = () => {
     const passwordField = document.getElementById("password") as HTMLInputElement | null;
     const checkBox = document.getElementById("hs-toggle-password-checkbox") as HTMLInputElement | null;
   

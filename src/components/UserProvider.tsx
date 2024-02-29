@@ -1,10 +1,13 @@
-import React, { createContext, useState } from "react";
+import React, { createContext, useState, ReactNode } from "react";
+import {
+  UserData,
+  UserContextType,
+} from "../types";
 
-export const UserContext = createContext({});
+export const UserContext = createContext<UserContextType>({ user: null, setUser: () => {} });
 
-export const UserProvider = ({ children }) => {
-  const [user, setUser] = useState({});
-
+export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const [user, setUser] = useState<UserData | null>(null);
   return (
     <UserContext.Provider value={{ user, setUser }}>
       {children}

@@ -9,11 +9,8 @@ import {
   passwordsMatch,
   validateName,  
 } from "../utils";
-// import { UserContext } from "./UserProvider";
 
 const Register: React.FC = () => {
-  // const { setUser } = useContext(UserContext);
-
   const [username, setUsername] = useState<string>("");
   const [firstname, setFirstname] = useState<string>("");
   const [lastname, setLastname] = useState<string>("");
@@ -45,48 +42,41 @@ const Register: React.FC = () => {
   const submitHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     setErrorMessage("");
-
-    try {
-      validateUsername(username);
-      validateName(firstname);
-      validateName(lastname);
-      validateEmail(email);
-      validatePassword(password); 
-      passwordsMatch(password, confirm);
-      // if no errors
-      const body = {
-        username,
-        password,
-        email,
-        firstname,
-        lastname
-      };
-      console.log(body);
-      fetch("http://localhost:8080/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      })
-      .then((response) => {
-        console.log('Response status code:', response.status); 
-        if (!response.ok) {
-          setErrorMessage("User already exists");
-          throw new Error("Failed to register");
-        }
-        // Handle success
-        // setUser(body);
-        // Redirect user to profile page
-        window.location.href = "/profile";
-      })
-      .catch((err) => {
-        console.error(err.message);
-      });
-
-    } catch (error: any) {
-      // Handle the error
-      console.error('An error occurred:', error.message);
-      setErrorMessage(error.message);
-    }
+    validateUsername(username);
+    validateName(firstname);
+    validateName(lastname);
+    validateEmail(email);
+    validatePassword(password); 
+    passwordsMatch(password, confirm);
+    // if no errors
+    const body = {
+      "username": username,
+      "password": password,
+      "email": email,
+      "firstName": firstname,
+      "lastName": lastname
+    };
+    console.log(body);
+    fetch("http://localhost:8080/auth/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    })
+    .then((response) => {
+      console.log('Response status code:', response.status); 
+      if (!response.ok) {
+        response.json().then(data => {
+          console.log(data.message); 
+          setErrorMessage(data.message);
+        })
+        throw new Error("Failed to register");
+      }
+      // Redirect user to login page
+      window.location.href = "/";
+    })
+    .catch((err) => {
+      console.error(err.message);
+    });
 
   };
 

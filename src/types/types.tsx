@@ -21,9 +21,15 @@ export interface ChatHeaderProps {
   
 
 export interface UserData {
-  firstname: string;
-  lastname: string;
+  id: number;
+  firstName: string;
+  lastName: string;
   username: string;
   email: string;
-  id: string;
+  roles: string[];
+}
+
+export interface UserContextType {
+  user: UserData | null;
+  setUser: React.Dispatch<React.SetStateAction<UserData | null>>;
 }

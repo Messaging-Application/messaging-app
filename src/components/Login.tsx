@@ -1,11 +1,14 @@
 import '../index.css'
 
-import { useState } from "react";
+import { useState, useContext } from "react";
 import React from 'react';
-// import { UserContext } from "./UserProvider";
+import { UserContext } from "./UserProvider";
+import {
+  UserContextType,
+} from "../types";
 
 const Login: React.FC = () => {
-  // const { setUser } = useContext(UserContext);
+  const { setUser } = useContext(UserContext) as UserContextType;
 
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -24,32 +27,34 @@ const Login: React.FC = () => {
     setErrorMessage("");
       if (username && password) {
         const body = {
-          username,
-          password,
+          "username": username,
+          "password": password,
         };
-        console.log(body);
         fetch("http://localhost:8080/auth/login", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: { "Content-Type": "application/json",     
+            Accept: 'application/json',
+          },
           body: JSON.stringify(body),
         })
         .then((response) => {
           console.log('Response status code:', response.status); 
           if (!response.ok) {
+            response.json().then(data => {
+              console.log(data.message); 
+              setErrorMessage(data.message);
+            })
             throw new Error("Failed to login");
           }
           console.log(response);
-          window.location.href = "/profile";
-          // Parse JSON response
-          // return response.json();
+          return response.json();
+        }).then(data => {
+          console.log(data);
+          setUser(data);
+          localStorage.setItem("user", JSON.stringify(data));
+          // Redirect user to chat page
+          // window.location.href = "/chat";
         })
-        // .then((userData) => {
-        //   // Handle success
-        //   setUser(userData);
-        //   console.log(userData);
-        //   // Redirect user to profile page
-        //   window.location.href = "/profile";
-        // })
         .catch((err) => {
           console.error(err.message);
           setErrorMessage(err.message);

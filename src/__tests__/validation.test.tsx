@@ -11,7 +11,11 @@ import {
         it('should throw an error when username is empty', () => {
           expect(() => validateUsername('')).toThrow('Please enter a username.');
         });
-      
+
+        it('should throw an error when username length is less than 4 characters', () => {
+          expect(() => validateUsername('usr')).toThrow('Username must be at least 4 characters long.');
+        });
+
         it('should throw an error when username contains invalid characters', () => {
           expect(() => validateUsername('user@name')).toThrow(
             'Username should only contain numbers, letters, dashes, dots, and underscores.'

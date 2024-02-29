@@ -10,12 +10,16 @@ import {
   Register,
   UserProvider,
   Profile,
-  Chat,
+  // Chat,
   // UserContext,
 } from "./components";
-import { io, Socket } from 'socket.io-client';
+// import {
+//   UserContextType,
+// } from "./types";
 
-const socket: Socket = io('http://localhost:4000');
+// import { io, Socket } from 'socket.io-client';
+
+// const socket: Socket = io('http://localhost:4000');
 
 const router = createBrowserRouter([
   {
@@ -31,15 +35,17 @@ const router = createBrowserRouter([
     path: "/profile",
     element: <Profile/>,
   },
-  {
-    path: "/chat",
-    element: <Chat socket={socket}/>,
-  },
+  // {
+  //   path: "/chat",
+  //   element: <Chat socket={socket}/>,
+  // },
   
 ]);
 
 const rootElement = document.getElementById("root");
-
+// const { user, setUser } = useContext(UserContext) as UserContextType;
+const userJSON = localStorage.getItem('cookie');
+console.log("!!!!!!", userJSON);
 if (rootElement) {
   ReactDOM.createRoot(rootElement).render(
     <React.StrictMode>

@@ -5,6 +5,10 @@ export const validateUsername = (username: string): true => {
     if (!/^[a-zA-Z0-9_.-]*$/.test(username)) {
         throw new Error('Username should only contain numbers, letters, dashes, dots, and underscores.');
     }
+    // Check if the username meets minimum length requirement
+    if (username.length < 4) {
+        throw new Error('Username must be at least 4 characters long.');
+    }
     return true;
 };
 

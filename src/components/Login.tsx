@@ -1,11 +1,15 @@
 import '../index.css'
 
-import { useState } from "react";
+import { useState, useContext } from "react";
 import React from 'react';
-// import { UserContext } from "./UserProvider";
+import { UserContext } from "./UserProvider";
+import {
+  UserContextType,
+} from "../types";
+import axios from 'axios';
 
 const Login: React.FC = () => {
-  // const { setUser } = useContext(UserContext);
+  const { setUser } = useContext(UserContext) as UserContextType;
 
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -19,45 +23,37 @@ const Login: React.FC = () => {
     setPassword(event.target.value);
   };
 
-  const submitHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
+const submitHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     setErrorMessage("");
-      if (username && password) {
-        const body = {
-          username,
-          password,
-        };
-        console.log(body);
-        fetch("http://localhost:8080/auth/login", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body),
-        })
-        .then((response) => {
-          console.log('Response status code:', response.status); 
-          if (!response.ok) {
-            throw new Error("Failed to login");
-          }
-          console.log(response);
-          window.location.href = "/profile";
-          // Parse JSON response
-          // return response.json();
-        })
-        // .then((userData) => {
-        //   // Handle success
-        //   setUser(userData);
-        //   console.log(userData);
-        //   // Redirect user to profile page
-        //   window.location.href = "/profile";
-        // })
-        .catch((err) => {
-          console.error(err.message);
-          setErrorMessage(err.message);
+    if (username && password) {
+      const body = {
+        "username": username,
+        "password": password,
+      };
+      axios.defaults.withCredentials = true;
+      try {
+        await axios.post('http://localhost:8080/auth/login', body, {
+          withCredentials: true,
+          headers: { crossDomain: true, 'Content-Type': 'application/json', 'Accept': '*/*',
+          'credentials': 'include' },
+        }).then(response => {
+            setUser(response.data);
+            localStorage.setItem("user", JSON.stringify(response.data));
+            const cookie = getCookieValue('ChatApp');
+            if (cookie) {
+              localStorage.setItem("jwt", cookie);
+            }
+            window.location.href = "/chat";
         });
+      } catch (error: any) {
+        console.error('Error:', error);
+        setErrorMessage("Failed to login");
+      }
     }
-  };
-
-  function togglePassword() {
+}   
+  
+  const togglePassword = () => {
     const passwordField = document.getElementById("password") as HTMLInputElement | null;
     const checkBox = document.getElementById("hs-toggle-password-checkbox") as HTMLInputElement | null;
   
@@ -162,3 +158,15 @@ const Login: React.FC = () => {
 }
 
 export default Login;
+
+function getCookieValue(cookieName: string) {
+  const cookieString = document.cookie;
+  const cookies = cookieString.split(';');
+  for (const cookie of cookies) {
+    const [name, value] = cookie.trim().split('=');
+    if (name === cookieName) {
+      return value;
+    }
+  }
+  return null; 
+}

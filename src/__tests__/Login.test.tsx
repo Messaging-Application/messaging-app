@@ -27,15 +27,4 @@ describe('Login component', () => {
     expect(passwordInput).toHaveValue('testpassword');
   });
 
-  test('submits form with username and password when Sign in button is clicked', async () => {
-    const { getByLabelText } = render(<Login />);
-    const usernameInput = getByLabelText('Username');
-    const passwordInput = getByLabelText('Password');
-    // const signInButton = getByText('Sign in');
-
-    fireEvent.change(usernameInput, { target: { value: 'testuser' } });
-    fireEvent.change(passwordInput, { target: { value: 'testpassword' } });
-    // fireEvent.click(signInButton);
-  });
-
 });

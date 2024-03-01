@@ -1,15 +1,20 @@
 import '../index.css'
-import { useState } from "react";
+import { useState, useContext } from "react";
 import React from 'react';
+import { UserContext } from "./UserProvider";
+import { UserContextType } from "../types";
 import { 
   validateEmail, 
   validatePassword,  
   validateUsername,  
   passwordsMatch,
   validateName,  
+  togglePasswordConfirm
 } from "../utils";
 
 const Profile: React.FC = () => {
+  const { setUser } = useContext(UserContext) as UserContextType;
+  const user = localStorage.getItem("user");
   const [username, setUsername] = useState<string>("session");
   const [firstname, setFirstname] = useState<string>("session");
   const [lastname, setLastname] = useState<string>("session");
@@ -85,24 +90,31 @@ const Profile: React.FC = () => {
         lastname
       };
       console.log(body);
-      fetch("http://localhost:8080/auth/profile", {
-        method: "PUT",
+      fetch("http://localhost:8080/auth/edit", {
+        method: "PATCH",
         headers: { 
           "Content-Type": "application/json",
-          'Authorization': 'Bearer <your_access_token>', 
+          'Authorization': 'Bearer ' + localStorage.getItem("jwt"), 
         },
         body: JSON.stringify(body),
       })
       .then((response) => {
         console.log('Response status code:', response.status); 
         if (!response.ok) {
-          setErrorMessage("Username already exists");
+          response.json().then(data => {
+            console.log(data.message); 
+            setErrorMessage(data.message);
+          })
           throw new Error("Failed to update profile");
         }
-        // Handle success
-        // setUser(body);
-        // Redirect user to profile page
-        window.location.href = "/profile";
+        // const bodyWithRoles = {
+        //   ...body,
+        //   roles: user.roles
+        // };
+        // localStorage.setItem("user", JSON.stringify(bodyWithRoles));
+        // setUser(bodyWithRoles);
+        window.location.href = "/chat";
+
       })
       .catch((err) => {
         console.error(err.message);
@@ -116,26 +128,6 @@ const Profile: React.FC = () => {
 
   };
 
-  function togglePassword() {
-    const passwordField = document.getElementById("password") as HTMLInputElement | null;
-    const confirmField = document.getElementById("confirm") as HTMLInputElement | null;
-    const checkBox = document.getElementById("hs-toggle-password-checkbox") as HTMLInputElement | null;
-  
-    if (passwordField && checkBox) {
-      if (checkBox.checked) {
-        passwordField.type = "text";
-      } else {
-        passwordField.type = "password";
-      }
-    }
-    if (confirmField && checkBox) {
-      if (checkBox.checked) {
-        confirmField.type = "text";
-      } else {
-        confirmField.type = "password";
-      }
-    }
-  }
   return (
     <>
       <div className="justify-center px-6 py-12 lg:px-8">
@@ -284,7 +276,7 @@ const Profile: React.FC = () => {
                 <div className="flex mt-4">
                   <input data-hs-toggle-password='{
                       "target": "#password, #confirm"
-                    }' onChange={togglePassword} id="hs-toggle-password-checkbox" type="checkbox" className="shrink-0 mt-0.5 border-gray-200 rounded"/>
+                    }' onChange={togglePasswordConfirm} id="hs-toggle-password-checkbox" type="checkbox" className="shrink-0 mt-0.5 border-gray-200 rounded"/>
                   <label htmlFor="hs-toggle-password-checkbox" className="text-sm text-gray-500 ms-3 dark:text-gray-400">Show password</label>
                 </div>
                 

@@ -8,6 +8,7 @@ import {
   validateUsername,  
   passwordsMatch,
   validateName,  
+  togglePasswordConfirm
 } from "../utils";
 
 const Register: React.FC = () => {
@@ -80,26 +81,6 @@ const Register: React.FC = () => {
 
   };
 
-  function togglePassword() {
-    const passwordField = document.getElementById("password") as HTMLInputElement | null;
-    const confirmField = document.getElementById("confirm") as HTMLInputElement | null;
-    const checkBox = document.getElementById("hs-toggle-password-checkbox") as HTMLInputElement | null;
-  
-    if (passwordField && checkBox) {
-      if (checkBox.checked) {
-        passwordField.type = "text";
-      } else {
-        passwordField.type = "password";
-      }
-    }
-    if (confirmField && checkBox) {
-      if (checkBox.checked) {
-        confirmField.type = "text";
-      } else {
-        confirmField.type = "password";
-      }
-    }
-  }
   return (
     <>
       <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
@@ -248,7 +229,7 @@ const Register: React.FC = () => {
                 <div className="flex mt-4">
                   <input data-hs-toggle-password='{
                       "target": "#password, #confirm"
-                    }' onChange={togglePassword} id="hs-toggle-password-checkbox" type="checkbox" className="shrink-0 mt-0.5 border-gray-200 rounded"/>
+                    }' onChange={togglePasswordConfirm} id="hs-toggle-password-checkbox" type="checkbox" className="shrink-0 mt-0.5 border-gray-200 rounded"/>
                   <label htmlFor="hs-toggle-password-checkbox" className="text-sm text-gray-500 ms-3 dark:text-gray-400">Show password</label>
                 </div>
                 

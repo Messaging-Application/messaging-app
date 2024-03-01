@@ -1,13 +1,15 @@
 import '../index.css'
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { UsersList, Profile } from './';
+import { UsersList, Profile, UserContext } from './';
 import {
   ChatProps,
   MessageData, 
   ChatBodyProps,
   ChatHeaderProps,
+  UserContextType,
 } from "../types";
+import axios from 'axios';
 
 const Chat: React.FC<ChatProps> = ({ socket }) => {
   const [showProfile, setShowProfile] = useState<boolean>(false);
@@ -40,13 +42,28 @@ const Chat: React.FC<ChatProps> = ({ socket }) => {
 };
 
 const ChatHeader: React.FC<ChatHeaderProps> = ({ setShowProfile }) => {
+  const { setUser } = useContext(UserContext) as UserContextType;
   const navigate = useNavigate();
-
-  const handleLeaveChat = () => {
-    localStorage.removeItem('usnermae');
-    navigate('/');
-    window.location.reload();
-  };
+  const handleLeaveChat = async (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    axios.defaults.withCredentials = true;
+    try {
+      await axios.post('http://localhost:8080/auth/logout', {}, {
+        withCredentials: true,
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': '*/*',
+          'credentials': 'include'
+        }
+      });
+      localStorage.removeItem('user');
+      localStorage.removeItem('jwt');
+      setUser(null);
+      navigate('/');
+      window.location.reload();
+    } catch (error: any) {
+      console.error('Error:', error);
+    } };
 
   return (
     <>

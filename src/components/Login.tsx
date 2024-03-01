@@ -6,6 +6,7 @@ import { UserContext } from "./UserProvider";
 import {
   UserContextType,
 } from "../types";
+import axios from 'axios';
 
 const Login: React.FC = () => {
   const { setUser } = useContext(UserContext) as UserContextType;
@@ -22,46 +23,36 @@ const Login: React.FC = () => {
     setPassword(event.target.value);
   };
 
-  const submitHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
+const submitHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     setErrorMessage("");
-      if (username && password) {
-        const body = {
-          "username": username,
-          "password": password,
-        };
-        fetch("http://localhost:8080/auth/login", {
-          method: "POST",
-          headers: { "Content-Type": "application/json",     
-            Accept: 'application/json',
-          },
-          body: JSON.stringify(body),
-        })
-        .then((response) => {
-          console.log('Response status code:', response.status); 
-          if (!response.ok) {
-            response.json().then(data => {
-              console.log(data.message); 
-              setErrorMessage(data.message);
-            })
-            throw new Error("Failed to login");
-          }
-          console.log(response);
-          return response.json();
-        }).then(data => {
-          console.log(data);
-          setUser(data);
-          localStorage.setItem("user", JSON.stringify(data));
-          // Redirect user to chat page
-          // window.location.href = "/chat";
-        })
-        .catch((err) => {
-          console.error(err.message);
-          setErrorMessage(err.message);
+    if (username && password) {
+      const body = {
+        "username": username,
+        "password": password,
+      };
+      axios.defaults.withCredentials = true;
+      try {
+        await axios.post('http://localhost:8080/auth/login', body, {
+          withCredentials: true,
+          headers: { crossDomain: true, 'Content-Type': 'application/json', 'Accept': '*/*',
+          'credentials': 'include' },
+        }).then(response => {
+            setUser(response.data);
+            localStorage.setItem("user", JSON.stringify(response.data));
+            const cookie = getCookieValue('ChatApp');
+            if (cookie) {
+              localStorage.setItem("jwt", cookie);
+            }
+            window.location.href = "/chat";
         });
+      } catch (error: any) {
+        console.error('Error:', error);
+        setErrorMessage("Failed to login");
+      }
     }
-  };
-
+}   
+  
   const togglePassword = () => {
     const passwordField = document.getElementById("password") as HTMLInputElement | null;
     const checkBox = document.getElementById("hs-toggle-password-checkbox") as HTMLInputElement | null;
@@ -167,3 +158,15 @@ const Login: React.FC = () => {
 }
 
 export default Login;
+
+function getCookieValue(cookieName: string) {
+  const cookieString = document.cookie;
+  const cookies = cookieString.split(';');
+  for (const cookie of cookies) {
+    const [name, value] = cookie.trim().split('=');
+    if (name === cookieName) {
+      return value;
+    }
+  }
+  return null; 
+}

@@ -10,7 +10,6 @@ import {
 } from "../utils";
 
 const Profile: React.FC = () => {
-
   const [username, setUsername] = useState<string>("session");
   const [firstname, setFirstname] = useState<string>("session");
   const [lastname, setLastname] = useState<string>("session");

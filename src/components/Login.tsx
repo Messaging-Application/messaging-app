@@ -3,9 +3,8 @@ import '../index.css'
 import { useState, useContext } from "react";
 import React from 'react';
 import { UserContext } from "./UserProvider";
-import {
-  UserContextType,
-} from "../types";
+import { UserContextType } from "../types";
+import { getCookie, togglePassword } from "../utils";
 import axios from 'axios';
 
 const Login: React.FC = () => {
@@ -40,7 +39,7 @@ const submitHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
         }).then(response => {
             setUser(response.data);
             localStorage.setItem("user", JSON.stringify(response.data));
-            const cookie = getCookieValue('ChatApp');
+            const cookie = getCookie('ChatApp');
             if (cookie) {
               localStorage.setItem("jwt", cookie);
             }
@@ -52,19 +51,7 @@ const submitHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
       }
     }
 }   
-  
-  const togglePassword = () => {
-    const passwordField = document.getElementById("password") as HTMLInputElement | null;
-    const checkBox = document.getElementById("hs-toggle-password-checkbox") as HTMLInputElement | null;
-  
-    if (passwordField && checkBox) {
-      if (checkBox.checked) {
-        passwordField.type = "text";
-      } else {
-        passwordField.type = "password";
-      }
-    }
-  }
+
   return (
     <>
       <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
@@ -158,15 +145,3 @@ const submitHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
 }
 
 export default Login;
-
-function getCookieValue(cookieName: string) {
-  const cookieString = document.cookie;
-  const cookies = cookieString.split(';');
-  for (const cookie of cookies) {
-    const [name, value] = cookie.trim().split('=');
-    if (name === cookieName) {
-      return value;
-    }
-  }
-  return null; 
-}

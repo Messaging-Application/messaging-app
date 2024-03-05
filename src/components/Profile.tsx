@@ -1,26 +1,28 @@
 import '../index.css'
-import { useState } from "react";
+import { useState, useContext } from "react";
 import React from 'react';
+import { UserContext } from "./UserProvider";
+import { UserContextType } from "../types";
 import { 
   validateEmail, 
   validatePassword,  
-  validateUsername,  
   passwordsMatch,
   validateName,  
+  togglePasswordConfirm
 } from "../utils";
 
 const Profile: React.FC = () => {
-  const [username, setUsername] = useState<string>("session");
-  const [firstname, setFirstname] = useState<string>("session");
-  const [lastname, setLastname] = useState<string>("session");
-  const [email, setEmail] = useState<string>("session");
-  const [password, setPassword] = useState<string>("session");
-  const [confirm, setConfirm] = useState<string>("session");
+  const { setUser } = useContext(UserContext) as UserContextType;
+  const userString = localStorage.getItem("user");
+  const user = userString ? JSON.parse(userString) : null;
+  const [username] = useState<string>(user.username);
+  const [firstname, setFirstname] = useState<string>(user.firstName);
+  const [lastname, setLastname] = useState<string>(user.lastName);
+  const [email, setEmail] = useState<string>(user.email);
+  const [password, setPassword] = useState<string>("");
+  const [confirm, setConfirm] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string>("");
 
-  const usernameChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setUsername(event.target.value);
-  };
   const firstnameChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
     setFirstname(event.target.value);
   };
@@ -40,20 +42,21 @@ const Profile: React.FC = () => {
   const deleteAccount = async (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     try {
-      const response = await fetch('http://localhost:8080/auth/profile', {
+      const response = await fetch("http://localhost:8081/user/delete/" + user.id, {
         method: 'DELETE',
+        credentials: "include", 
         headers: {
-          'Authorization': 'Bearer <your_access_token>',
+          'Authorization': 'Bearer ' + localStorage.getItem("jwt"),
           'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          // Additional data if needed
-        })
+        }
       });
   
       if (response.ok) {
-        // Account deletion successful
         console.log('Account deleted successfully');
+        localStorage.removeItem('user');
+        localStorage.removeItem('jwt');
+        setUser(null);
+        window.location.reload();
       } else {
         // Handle error response
         setErrorMessage('Failed to delete account');
@@ -70,7 +73,6 @@ const Profile: React.FC = () => {
     setErrorMessage("");
 
     try {
-      validateUsername(username);
       validateName(firstname);
       validateName(lastname);
       validateEmail(email);
@@ -78,31 +80,41 @@ const Profile: React.FC = () => {
       passwordsMatch(password, confirm);
       // if no errors
       const body = {
-        username,
-        password,
-        email,
-        firstname,
-        lastname
+        "password": password,
+        "email": email,
+        "firstName": firstname,
+        "lastName": lastname
       };
-      console.log(body);
-      fetch("http://localhost:8080/auth/profile", {
-        method: "PUT",
+      fetch("http://localhost:8081/user/edit/" + user.id, {
+        method: "PATCH",
+        credentials: "include", 
         headers: { 
           "Content-Type": "application/json",
-          'Authorization': 'Bearer <your_access_token>', 
+          'Authorization': 'Bearer ' + localStorage.getItem("jwt"), 
         },
         body: JSON.stringify(body),
       })
       .then((response) => {
         console.log('Response status code:', response.status); 
         if (!response.ok) {
-          setErrorMessage("Username already exists");
+          response.json().then(data => {
+            setErrorMessage(data.message);
+          })
           throw new Error("Failed to update profile");
         }
-        // Handle success
-        // setUser(body);
-        // Redirect user to profile page
-        window.location.href = "/profile";
+        const userString = localStorage.getItem("user");
+        if (userString) {
+          const userJson = JSON.parse(userString);
+          userJson.firstName = body.firstName;
+          userJson.lastName = body.lastName;
+          userJson.email = body.email;
+          localStorage.removeItem('user');
+          localStorage.setItem("user", JSON.stringify(userJson));
+          setUser(null);
+          setUser(userJson);
+        }       
+        window.location.reload();
+
       })
       .catch((err) => {
         console.error(err.message);
@@ -116,26 +128,6 @@ const Profile: React.FC = () => {
 
   };
 
-  function togglePassword() {
-    const passwordField = document.getElementById("password") as HTMLInputElement | null;
-    const confirmField = document.getElementById("confirm") as HTMLInputElement | null;
-    const checkBox = document.getElementById("hs-toggle-password-checkbox") as HTMLInputElement | null;
-  
-    if (passwordField && checkBox) {
-      if (checkBox.checked) {
-        passwordField.type = "text";
-      } else {
-        passwordField.type = "password";
-      }
-    }
-    if (confirmField && checkBox) {
-      if (checkBox.checked) {
-        confirmField.type = "text";
-      } else {
-        confirmField.type = "password";
-      }
-    }
-  }
   return (
     <>
       <div className="justify-center px-6 py-12 lg:px-8">
@@ -159,7 +151,7 @@ const Profile: React.FC = () => {
           <form className="space-y-6" action="#" method="POST">
             <div>
               <label htmlFor="username" className="block text-sm font-medium leading-6 text-gray-900">
-                Username
+              Username
               </label>
               <div className="mt-2">
                 <input
@@ -167,9 +159,8 @@ const Profile: React.FC = () => {
                   name="username"
                   type="text"
                   value={username}
-                  onChange={usernameChangeHandler}
                   autoComplete="username"
-                  required
+                  readOnly
                   placeholder="Enter username"
                   className="fade-in block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 />
@@ -284,7 +275,7 @@ const Profile: React.FC = () => {
                 <div className="flex mt-4">
                   <input data-hs-toggle-password='{
                       "target": "#password, #confirm"
-                    }' onChange={togglePassword} id="hs-toggle-password-checkbox" type="checkbox" className="shrink-0 mt-0.5 border-gray-200 rounded"/>
+                    }' onChange={togglePasswordConfirm} id="hs-toggle-password-checkbox" type="checkbox" className="shrink-0 mt-0.5 border-gray-200 rounded"/>
                   <label htmlFor="hs-toggle-password-checkbox" className="text-sm text-gray-500 ms-3 dark:text-gray-400">Show password</label>
                 </div>
                 

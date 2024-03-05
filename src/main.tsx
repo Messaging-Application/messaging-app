@@ -25,7 +25,7 @@ const App = () => {
     <Routes>
       <Route path="/" element={<Login />} />
       <Route path="/register" element={<Register />} />
-      <Route path="/chat" element={user ? <Chat socket={socket}/> : <Navigate to="/" />} />
+      <Route path="/chat" element={user ? <Chat socket={socket} selectedUser={null}/> : <Navigate to="/" />} />
     </Routes>
   );
 };

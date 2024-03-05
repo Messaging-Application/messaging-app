@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import {
-    ChatHeaderProps,
+    UsersListProps,
     UserData,
   } from "../types";
 
-const UsersList: React.FC<ChatHeaderProps> = ({ setShowProfile }) => {
+const UsersList: React.FC<UsersListProps> = ({ setShowProfile, setSelectedUser }) => {
     const [users, setUsers] = useState<UserData[]>([]);
     useEffect(() => {
       const fetchUsers = async () => {
@@ -29,12 +29,12 @@ const UsersList: React.FC<ChatHeaderProps> = ({ setShowProfile }) => {
         <div>
           <h4 className="chat__header">Users</h4>
           <div className="chat__users">
-          {users.map((user: UserData, index) => (
+          {users.map((friend: UserData, index) => (
             // go to this chat
-            <button key={index} onClick={() => setShowProfile(false)} style={{width:"100%", backgroundColor:"transparent", textAlign:"left", paddingLeft:"6px", height:"50pt", color:"grey", fontSize:"15px"}}><p style={{fontSize:"18px", color:"black"}}><b>{user.firstname} {user.lastname} ({user.username})</b></p>  <i>Hey i missed you so much, how are you?...</i></button>
+            <button key={index} onClick={() => {setShowProfile(false);  setSelectedUser(friend); }} style={{width:"100%", backgroundColor:"transparent", textAlign:"left", paddingLeft:"6px", height:"30pt", color:"grey", fontSize:"15px"}}><p style={{fontSize:"18px", color:"black"}}><b>{friend.username}</b></p> </button>
           ))}
-          <button onClick={() => setShowProfile(false)} style={{width:"100%", backgroundColor:"transparent", textAlign:"left", paddingLeft:"6px", height:"50pt", color:"grey", fontSize:"15px"}}><p style={{fontSize:"18px", color:"black"}}><b>Nefeli</b></p>  <i>Hey, how are you?...</i></button>
-          <button onClick={() => setShowProfile(false)} style={{width:"100%", backgroundColor:"transparent", textAlign:"left", paddingLeft:"6px", height:"50pt", color:"grey", fontSize:"15px"}}><p style={{fontSize:"18px", color:"black"}}><b>Mariana</b></p> <i>Hey, how are you?...</i></button>
+          <button onClick={() => setShowProfile(false)} style={{width:"100%", backgroundColor:"transparent", textAlign:"left", paddingLeft:"6px", height:"30pt", color:"grey", fontSize:"15px"}}><p style={{fontSize:"18px", color:"black"}}><b>Nefeli</b></p> </button>
+          <button onClick={() => setShowProfile(false)} style={{width:"100%", backgroundColor:"transparent", textAlign:"left", paddingLeft:"6px", height:"30pt", color:"grey", fontSize:"15px"}}><p style={{fontSize:"18px", color:"black"}}><b>Mariana</b></p></button>
           </div>
         </div>
       </div>

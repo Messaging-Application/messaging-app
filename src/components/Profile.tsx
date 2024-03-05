@@ -6,26 +6,25 @@ import { UserContextType } from "../types";
 import { 
   validateEmail, 
   validatePassword,  
-  validateUsername,  
   passwordsMatch,
   validateName,  
   togglePasswordConfirm
 } from "../utils";
+import { useNavigate } from 'react-router-dom';
 
 const Profile: React.FC = () => {
+  const navigate = useNavigate();
   const { setUser } = useContext(UserContext) as UserContextType;
-  const user = localStorage.getItem("user");
-  const [username, setUsername] = useState<string>("session");
-  const [firstname, setFirstname] = useState<string>("session");
-  const [lastname, setLastname] = useState<string>("session");
-  const [email, setEmail] = useState<string>("session");
-  const [password, setPassword] = useState<string>("session");
-  const [confirm, setConfirm] = useState<string>("session");
+  const userString = localStorage.getItem("user");
+  const user = userString ? JSON.parse(userString) : null;
+  const [username] = useState<string>(user.username);
+  const [firstname, setFirstname] = useState<string>(user.firstName);
+  const [lastname, setLastname] = useState<string>(user.lastName);
+  const [email, setEmail] = useState<string>(user.email);
+  const [password, setPassword] = useState<string>("");
+  const [confirm, setConfirm] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string>("");
 
-  const usernameChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setUsername(event.target.value);
-  };
   const firstnameChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
     setFirstname(event.target.value);
   };
@@ -45,20 +44,22 @@ const Profile: React.FC = () => {
   const deleteAccount = async (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     try {
-      const response = await fetch('http://localhost:8080/auth/profile', {
+      const response = await fetch("http://localhost:8081/user/delete/" + user.id, {
         method: 'DELETE',
+        credentials: "include", 
         headers: {
-          'Authorization': 'Bearer <your_access_token>',
+          'Authorization': 'Bearer ' + localStorage.getItem("jwt"),
           'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          // Additional data if needed
-        })
+        }
       });
   
       if (response.ok) {
-        // Account deletion successful
         console.log('Account deleted successfully');
+        localStorage.removeItem('user');
+        localStorage.removeItem('jwt');
+        setUser(null);
+        navigate('/');
+        window.location.reload();
       } else {
         // Handle error response
         setErrorMessage('Failed to delete account');
@@ -75,7 +76,6 @@ const Profile: React.FC = () => {
     setErrorMessage("");
 
     try {
-      validateUsername(username);
       validateName(firstname);
       validateName(lastname);
       validateEmail(email);
@@ -83,15 +83,14 @@ const Profile: React.FC = () => {
       passwordsMatch(password, confirm);
       // if no errors
       const body = {
-        username,
-        password,
-        email,
-        firstname,
-        lastname
+        "password": password,
+        "email": email,
+        "firstName": firstname,
+        "lastName": lastname
       };
-      console.log(body);
-      fetch("http://localhost:8080/auth/edit", {
+      fetch("http://localhost:8081/user/edit/" + user.id, {
         method: "PATCH",
+        credentials: "include", 
         headers: { 
           "Content-Type": "application/json",
           'Authorization': 'Bearer ' + localStorage.getItem("jwt"), 
@@ -102,18 +101,22 @@ const Profile: React.FC = () => {
         console.log('Response status code:', response.status); 
         if (!response.ok) {
           response.json().then(data => {
-            console.log(data.message); 
             setErrorMessage(data.message);
           })
           throw new Error("Failed to update profile");
         }
-        // const bodyWithRoles = {
-        //   ...body,
-        //   roles: user.roles
-        // };
-        // localStorage.setItem("user", JSON.stringify(bodyWithRoles));
-        // setUser(bodyWithRoles);
-        window.location.href = "/chat";
+        const userString = localStorage.getItem("user");
+        if (userString) {
+          const userJson = JSON.parse(userString);
+          userJson.firstName = body.firstName;
+          userJson.lastName = body.lastName;
+          userJson.email = body.email;
+          localStorage.removeItem('user');
+          localStorage.setItem("user", JSON.stringify(userJson));
+          setUser(null);
+          setUser(userJson);
+        }       
+        window.location.reload();
 
       })
       .catch((err) => {
@@ -151,7 +154,7 @@ const Profile: React.FC = () => {
           <form className="space-y-6" action="#" method="POST">
             <div>
               <label htmlFor="username" className="block text-sm font-medium leading-6 text-gray-900">
-                Username
+              Username
               </label>
               <div className="mt-2">
                 <input
@@ -159,9 +162,8 @@ const Profile: React.FC = () => {
                   name="username"
                   type="text"
                   value={username}
-                  onChange={usernameChangeHandler}
                   autoComplete="username"
-                  required
+                  readOnly
                   placeholder="Enter username"
                   className="fade-in block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 />

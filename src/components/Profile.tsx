@@ -10,10 +10,8 @@ import {
   validateName,  
   togglePasswordConfirm
 } from "../utils";
-import { useNavigate } from 'react-router-dom';
 
 const Profile: React.FC = () => {
-  const navigate = useNavigate();
   const { setUser } = useContext(UserContext) as UserContextType;
   const userString = localStorage.getItem("user");
   const user = userString ? JSON.parse(userString) : null;
@@ -58,7 +56,6 @@ const Profile: React.FC = () => {
         localStorage.removeItem('user');
         localStorage.removeItem('jwt');
         setUser(null);
-        navigate('/');
         window.location.reload();
       } else {
         // Handle error response

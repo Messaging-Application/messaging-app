@@ -22,12 +22,14 @@ export interface MessageData {
 export interface ChatHeaderProps {
   setShowProfile: React.Dispatch<React.SetStateAction<boolean>>;
   selectedUser: UserData | null; 
+  handleShowUser: (user: UserData | null) => void; 
 }
   
 
 export interface UsersListProps {
   setShowProfile: React.Dispatch<React.SetStateAction<boolean>>;
   setSelectedUser: React.Dispatch<React.SetStateAction<UserData | null>>; 
+  handleShowUser: (user: UserData | null) => void; 
 }
   
 
@@ -43,4 +45,8 @@ export interface UserData {
 export interface UserContextType {
   user: UserData | null;
   setUser: React.Dispatch<React.SetStateAction<UserData | null>>;
+}
+
+export interface ProfileProps {
+  showUser:  UserData | null; 
 }

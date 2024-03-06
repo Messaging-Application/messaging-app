@@ -2,7 +2,7 @@ import { render, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom'
 
 import Profile from '../components/Profile';
-
+import { UserData } from '../types';
 describe('Profile component', () => {
 
   jest.spyOn(window.localStorage.__proto__, 'getItem').mockImplementation((key) => {
@@ -17,8 +17,17 @@ describe('Profile component', () => {
     return null; 
   });
 
+  const mockUser: UserData = {
+    id: 1,
+    firstName: 'John',
+    lastName: 'Doe',
+    username: 'johndoe',
+    email: 'johndoe@gmail.com',
+    roles: ["ROLE_USER"]
+  };
+
   test('renders username, password, confirm fields', () => {
-    const { getByLabelText } = render(<Profile />);
+    const { getByLabelText } = render(<Profile showUser={mockUser}/>);
     const usernameInput = getByLabelText('Username');
     const passwordInput = getByLabelText('Password');
     const confirmInput = getByLabelText('Confirm Password');
@@ -35,7 +44,7 @@ describe('Profile component', () => {
   });
 
   test('allows user to enter username, password, confirm', () => {
-    const { getByLabelText } = render(<Profile />);
+    const { getByLabelText } = render(<Profile showUser={mockUser}/>);
     const passwordInput = getByLabelText('Password');
     const confirmInput = getByLabelText('Confirm Password');
     const emailInput = getByLabelText('Email');
@@ -56,7 +65,7 @@ describe('Profile component', () => {
   });
 
   test('submits form with username, password, confirm when Sign up button is clicked', async () => {
-    const { getByLabelText } = render(<Profile />);
+    const { getByLabelText } = render(<Profile showUser={mockUser}/>);
     const passwordInput = getByLabelText('Password');
     const confirmInput = getByLabelText('Confirm Password');
     const emailInput = getByLabelText('Email');

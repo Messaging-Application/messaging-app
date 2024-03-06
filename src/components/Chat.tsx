@@ -17,6 +17,7 @@ const Chat: React.FC<ChatProps> = ({ socket }) => {
   const [messages, setMessages] = useState<MessageData[]>([]);
   const lastMessageRef = useRef<HTMLDivElement>(null);
   const [selectedUser, setSelectedUser] = useState<UserData | null>(null); 
+  const [showUser, setShowUser] = useState<UserData | null>(null); 
 
   useEffect(() => {
     socket.on('messageResponse', (data: MessageData) => setMessages([...messages, data]));
@@ -26,24 +27,28 @@ const Chat: React.FC<ChatProps> = ({ socket }) => {
     lastMessageRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  const handleShowUser = (user: UserData | null) => {
+    setShowUser(user);
+  };
+
   return (
     <div className="chat">
-      <UsersList setShowProfile={setShowProfile} setSelectedUser={setSelectedUser}/> 
+      <UsersList setShowProfile={setShowProfile} setSelectedUser={setSelectedUser} handleShowUser={handleShowUser}/> 
       <div className="chat__main">
-      <ChatHeader setShowProfile={setShowProfile} selectedUser={selectedUser}/> 
+      <ChatHeader setShowProfile={setShowProfile} selectedUser={selectedUser} handleShowUser={handleShowUser}/> 
         {!showProfile && (
           <>
             <ChatBody messages={messages} lastMessageRef={lastMessageRef}/>
             <ChatFooter socket={socket} selectedUser={selectedUser}/>
           </>
         )}
-        {showProfile && <Profile />}
+        {showProfile && <Profile key={showUser?.id} showUser={showUser}/>}
       </div>
     </div>
   );
 };
 
-const ChatHeader: React.FC<ChatHeaderProps> = ({ setShowProfile, selectedUser }) => {
+const ChatHeader: React.FC<ChatHeaderProps> = ({ setShowProfile, selectedUser, handleShowUser }) => {
   const { setUser } = useContext(UserContext) as UserContextType;
   const navigate = useNavigate();
   const handleLeaveChat = async (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -71,7 +76,7 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({ setShowProfile, selectedUser })
     <>
       <header className="chat__mainHeader">
         <p>{selectedUser?.username} ({selectedUser?.firstName} {selectedUser?.lastName})</p>
-        <button style={{float:"right", marginRight:"10px"}} className="leaveChat__btn" onClick={() => setShowProfile(true)}>
+        <button style={{float:"right", marginRight:"10px"}} className="leaveChat__btn" onClick={() => {setShowProfile(true); handleShowUser(null);}}>
           Profile
         </button>
         <button style={{float:"right", marginRight:"10px"}} className="leaveChat__btn" onClick={handleLeaveChat}>

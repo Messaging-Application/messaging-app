@@ -204,3 +204,7 @@ button:focus-visible {
 .sender__name {
   text-align: right;
 }
+
+.container {
+  display: flex;
+}

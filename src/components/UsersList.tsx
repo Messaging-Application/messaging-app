@@ -3,8 +3,9 @@ import {
     UsersListProps,
     UserData,
   } from "../types";
+import "../index.css"
 
-const UsersList: React.FC<UsersListProps> = ({ setShowProfile, setSelectedUser }) => {
+const UsersList: React.FC<UsersListProps> = ({ setShowProfile, setSelectedUser, handleShowUser }) => {
     const [users, setUsers] = useState<UserData[]>([]);
     useEffect(() => {
       const fetchUsers = async () => {
@@ -22,6 +23,7 @@ const UsersList: React.FC<UsersListProps> = ({ setShowProfile, setSelectedUser }
   
       fetchUsers();
     }, []); 
+
   
     return (
       <div className="chat__sidebar">
@@ -33,8 +35,16 @@ const UsersList: React.FC<UsersListProps> = ({ setShowProfile, setSelectedUser }
             // go to this chat
             <button key={index} onClick={() => {setShowProfile(false);  setSelectedUser(friend); }} style={{width:"100%", backgroundColor:"transparent", textAlign:"left", paddingLeft:"6px", height:"30pt", color:"grey", fontSize:"15px"}}><p style={{fontSize:"18px", color:"black"}}><b>{friend.username}</b></p> </button>
           ))}
-          <button onClick={() => setShowProfile(false)} style={{width:"100%", backgroundColor:"transparent", textAlign:"left", paddingLeft:"6px", height:"30pt", color:"grey", fontSize:"15px"}}><p style={{fontSize:"18px", color:"black"}}><b>Nefeli</b></p> </button>
-          <button onClick={() => setShowProfile(false)} style={{width:"100%", backgroundColor:"transparent", textAlign:"left", paddingLeft:"6px", height:"30pt", color:"grey", fontSize:"15px"}}><p style={{fontSize:"18px", color:"black"}}><b>Mariana</b></p></button>
+          <div className="container">
+            <button onClick={() => setShowProfile(false)} style={{width:"100%", backgroundColor:"transparent", textAlign:"left", paddingLeft:"6px", height:"30pt", color:"grey", fontSize:"15px"}}><p style={{fontSize:"18px", color:"black"}}><b>Nefeli</b></p> </button><button style={{float:"right", marginRight:"10px"}} className="leaveChat__btn" onClick={() => {setShowProfile(true); handleShowUser(null) } }>
+              Profile
+            </button>
+          </div>
+          <div className="container">
+            <button onClick={() => setShowProfile(false)} style={{width:"100%", backgroundColor:"transparent", textAlign:"left", paddingLeft:"6px", height:"30pt", color:"grey", fontSize:"15px"}}><p style={{fontSize:"18px", color:"black"}}><b>Mariana</b></p></button><button style={{float:"right", marginRight:"10px"}} className="leaveChat__btn" onClick={() => {setShowProfile(true); handleShowUser(null) } }>
+              Profile
+            </button>
+          </div>
           </div>
         </div>
       </div>

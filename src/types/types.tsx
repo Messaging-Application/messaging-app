@@ -23,6 +23,7 @@ export interface ChatHeaderProps {
   setShowProfile: React.Dispatch<React.SetStateAction<boolean>>;
   selectedUser: UserData | null; 
   handleShowUser: (user: UserData | null) => void; 
+  setSelectedUser: React.Dispatch<React.SetStateAction<UserData | null>>; 
 }
   
 

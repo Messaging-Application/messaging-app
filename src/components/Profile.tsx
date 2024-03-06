@@ -19,7 +19,7 @@ const Profile: React.FC<ProfileProps> = ({ showUser }) => {
   if (showUser && typeof showUser === 'object') {
     user = showUser as UserData;
   }
-  console.log(user);
+  console.log("------------user " , user);
 
   const [username] = useState<string>(user?.username || '');
   const [firstname, setFirstname] = useState<string>(user?.firstName || '');

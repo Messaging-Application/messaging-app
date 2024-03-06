@@ -35,7 +35,7 @@ const Chat: React.FC<ChatProps> = ({ socket }) => {
     <div className="chat">
       <UsersList setShowProfile={setShowProfile} setSelectedUser={setSelectedUser} handleShowUser={handleShowUser}/> 
       <div className="chat__main">
-      <ChatHeader setShowProfile={setShowProfile} selectedUser={selectedUser} handleShowUser={handleShowUser}/> 
+      <ChatHeader setShowProfile={setShowProfile} selectedUser={selectedUser} handleShowUser={handleShowUser} setSelectedUser={setSelectedUser}/> 
         {!showProfile && (
           <>
             <ChatBody messages={messages} lastMessageRef={lastMessageRef}/>
@@ -48,7 +48,7 @@ const Chat: React.FC<ChatProps> = ({ socket }) => {
   );
 };
 
-const ChatHeader: React.FC<ChatHeaderProps> = ({ setShowProfile, selectedUser, handleShowUser }) => {
+const ChatHeader: React.FC<ChatHeaderProps> = ({ setShowProfile, selectedUser, handleShowUser, setSelectedUser }) => {
   const { setUser } = useContext(UserContext) as UserContextType;
   const navigate = useNavigate();
   const handleLeaveChat = async (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -75,8 +75,8 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({ setShowProfile, selectedUser, h
   return (
     <>
       <header className="chat__mainHeader">
-        <p>{selectedUser?.username} ({selectedUser?.firstName} {selectedUser?.lastName})</p>
-        <button style={{float:"right", marginRight:"10px"}} className="leaveChat__btn" onClick={() => {setShowProfile(true); handleShowUser(null);}}>
+        {selectedUser && (<p>{selectedUser?.username} ({selectedUser?.firstName} {selectedUser?.lastName})</p>) }
+        <button style={{float:"right", marginRight:"10px"}} className="leaveChat__btn" onClick={() => {setShowProfile(true); handleShowUser(null); setSelectedUser(null);}}>
           Profile
         </button>
         <button style={{float:"right", marginRight:"10px"}} className="leaveChat__btn" onClick={handleLeaveChat}>
@@ -132,7 +132,7 @@ const ChatFooter = ({ socket, selectedUser }: ChatProps) => {
         messageContent: message,
         senderId: user?.id,
         receiverId: selectedUser?.id,
-        timestamp: Date.now(),
+        // timestamp: Date.now(),
         messageId: `${socket.id}${Math.random()}`,
       });
     }

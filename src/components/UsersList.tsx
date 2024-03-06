@@ -1,27 +1,65 @@
 import React, { useState, useEffect } from 'react';
 import {
-    ChatHeaderProps,
+    UsersListProps,
     UserData,
   } from "../types";
+import "../index.css"
 
-const UsersList: React.FC<ChatHeaderProps> = ({ setShowProfile }) => {
+const UsersList: React.FC<UsersListProps> = ({ setShowProfile, setSelectedUser, handleShowUser }) => {
     const [users, setUsers] = useState<UserData[]>([]);
+    const [currentPage, setCurrentPage] = useState(0);
+    const [totalPages] = useState(3);
+    const userString = localStorage.getItem("user");
+    const user: UserData | null = userString ? JSON.parse(userString) : null;    
     useEffect(() => {
       const fetchUsers = async () => {
         try {
-          const response = await fetch('users');
+          const response = await fetch(`http://localhost:8081/user/all?pageNo=${currentPage}&pageSize=${totalPages}`, {
+            method: "GET",
+            credentials: "include", 
+            headers: { 
+              "Content-Type": "application/json",
+              'Authorization': 'Bearer ' + localStorage.getItem("jwt"), 
+            },
+          });
+          
+          console.log('Response status code:', response.status); 
+          
           if (!response.ok) {
-            throw new Error('Failed to fetch users');
+            throw new Error("Failed to update profile");
           }
-          const data = await response.json();
-          setUsers(data.users); 
+    
+          // Parse the response body as JSON
+          const responseBody = await response.json();
+
+          for (const key in responseBody) {
+            const parsedResponse = JSON.parse(responseBody[key]);
+            console.log(parsedResponse.user2);
+            setUsers(users => {
+              const userSet = new Set(users.map(user => user.id));
+              if (!userSet.has(parsedResponse.user2.id)) {
+                  return [...users, parsedResponse.user2];
+              } else {
+                  return users;
+              }
+          });
+          
+          }
+
         } catch (error) {
           console.error('Error fetching users:', error);
         }
       };
-  
+    
       fetchUsers();
-    }, []); 
+    }, [currentPage, totalPages]);
+    
+    const goToPage = (page: number) => {
+      setCurrentPage(page);
+      setUsers([]); // Clear existing data before fetching new data
+    };
+
+  
   
     return (
       <div className="chat__sidebar">
@@ -29,12 +67,50 @@ const UsersList: React.FC<ChatHeaderProps> = ({ setShowProfile }) => {
         <div>
           <h4 className="chat__header">Users</h4>
           <div className="chat__users">
-          {users.map((user: UserData, index) => (
-            // go to this chat
-            <button key={index} onClick={() => setShowProfile(false)} style={{width:"100%", backgroundColor:"transparent", textAlign:"left", paddingLeft:"6px", height:"50pt", color:"grey", fontSize:"15px"}}><p style={{fontSize:"18px", color:"black"}}><b>{user.firstname} {user.lastname} ({user.username})</b></p>  <i>Hey i missed you so much, how are you?...</i></button>
-          ))}
-          <button onClick={() => setShowProfile(false)} style={{width:"100%", backgroundColor:"transparent", textAlign:"left", paddingLeft:"6px", height:"50pt", color:"grey", fontSize:"15px"}}><p style={{fontSize:"18px", color:"black"}}><b>Nefeli</b></p>  <i>Hey, how are you?...</i></button>
-          <button onClick={() => setShowProfile(false)} style={{width:"100%", backgroundColor:"transparent", textAlign:"left", paddingLeft:"6px", height:"50pt", color:"grey", fontSize:"15px"}}><p style={{fontSize:"18px", color:"black"}}><b>Mariana</b></p> <i>Hey, how are you?...</i></button>
+          {!user?.roles.includes("ROLE_ADMIN") ? (
+            // If the user is not an admin, render the simple button
+            users.map((friend: UserData, index) => (
+              <button key={index} onClick={() => {setShowProfile(false); setSelectedUser(friend); }} style={{width:"100%", backgroundColor:"transparent", textAlign:"left", paddingLeft:"6px", height:"30pt", color:"grey", fontSize:"15px"}}>
+                <p style={{fontSize:"18px", color:"black"}}><b>{friend.username}</b></p>
+              </button>
+            ))
+          ) : (
+            // If the user is an admin, render the button with profile option
+            users.map((friend: UserData, index) => (
+              <div key={index} className="container">
+                <button onClick={() => {setShowProfile(false); setSelectedUser(friend);}} style={{width:"100%", backgroundColor:"transparent", textAlign:"left", paddingLeft:"6px", height:"30pt", color:"grey", fontSize:"15px"}}>
+                  <p style={{fontSize:"18px", color:"black"}}><b>{friend.username}</b></p>
+                </button>
+                <button style={{float:"right", marginRight:"10px"}} className="leaveChat__btn" onClick={() => {setShowProfile(true); handleShowUser(friend)}}>
+                  Profile
+                </button>
+              </div>
+            ))
+          )}
+         
+          </div>
+          <div>
+            {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => (
+            <button
+            style={{
+              color: "white",
+              backgroundColor: "#4f46e5",
+              border: "none",
+              borderRadius: "25px",
+              padding: "10px 20px",
+              boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+              cursor: "pointer",
+              margin: "0 10px",
+              fontSize: "18px",
+              transition: "background-color 0.3s, transform 0.3s",
+            }}
+            key={page}
+            onClick={() => goToPage(page)}
+          >
+            {page}
+          </button>
+
+            ))}
           </div>
         </div>
       </div>

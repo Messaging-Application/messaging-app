@@ -2,7 +2,7 @@ import '../index.css'
 import { useState, useContext } from "react";
 import React from 'react';
 import { UserContext } from "./UserProvider";
-import { UserContextType } from "../types";
+import { UserContextType, ProfileProps, UserData } from "../types";
 import { 
   validateEmail, 
   validatePassword,  
@@ -11,14 +11,20 @@ import {
   togglePasswordConfirm
 } from "../utils";
 
-const Profile: React.FC = () => {
+const Profile: React.FC<ProfileProps> = ({ showUser }) => {
   const { setUser } = useContext(UserContext) as UserContextType;
   const userString = localStorage.getItem("user");
-  const user = userString ? JSON.parse(userString) : null;
-  const [username] = useState<string>(user.username);
-  const [firstname, setFirstname] = useState<string>(user.firstName);
-  const [lastname, setLastname] = useState<string>(user.lastName);
-  const [email, setEmail] = useState<string>(user.email);
+  let user: UserData | null = userString ? JSON.parse(userString) : null;
+  const currentUser = user;
+  if (showUser && typeof showUser === 'object') {
+    user = showUser as UserData;
+  }
+  console.log("------------user " , user);
+
+  const [username] = useState<string>(user?.username || '');
+  const [firstname, setFirstname] = useState<string>(user?.firstName || '');
+  const [lastname, setLastname] = useState<string>(user?.lastName || '');
+  const [email, setEmail] = useState<string>(user?.email || '');
   const [password, setPassword] = useState<string>("");
   const [confirm, setConfirm] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string>("");
@@ -42,7 +48,7 @@ const Profile: React.FC = () => {
   const deleteAccount = async (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     try {
-      const response = await fetch("http://localhost:8081/user/delete/" + user.id, {
+      const response = await fetch("http://localhost:8081/user/delete/" + user?.id, {
         method: 'DELETE',
         credentials: "include", 
         headers: {
@@ -53,9 +59,11 @@ const Profile: React.FC = () => {
   
       if (response.ok) {
         console.log('Account deleted successfully');
-        localStorage.removeItem('user');
-        localStorage.removeItem('jwt');
-        setUser(null);
+        if (!currentUser?.roles.includes("ROLE_ADMIN")) {
+          localStorage.removeItem('user');
+          localStorage.removeItem('jwt');
+          setUser(null);
+        }
         window.location.reload();
       } else {
         // Handle error response
@@ -85,7 +93,7 @@ const Profile: React.FC = () => {
         "firstName": firstname,
         "lastName": lastname
       };
-      fetch("http://localhost:8081/user/edit/" + user.id, {
+      fetch("http://localhost:8081/user/edit/" + user?.id, {
         method: "PATCH",
         credentials: "include", 
         headers: { 
@@ -102,19 +110,19 @@ const Profile: React.FC = () => {
           })
           throw new Error("Failed to update profile");
         }
-        const userString = localStorage.getItem("user");
-        if (userString) {
-          const userJson = JSON.parse(userString);
-          userJson.firstName = body.firstName;
-          userJson.lastName = body.lastName;
-          userJson.email = body.email;
-          localStorage.removeItem('user');
-          localStorage.setItem("user", JSON.stringify(userJson));
-          setUser(null);
-          setUser(userJson);
-        }       
+        if (!currentUser?.roles.includes("ROLE_ADMIN")) {
+          if (userString) {
+            const userJson = JSON.parse(userString);
+            userJson.firstName = body.firstName;
+            userJson.lastName = body.lastName;
+            userJson.email = body.email;
+            localStorage.removeItem('user');
+            localStorage.setItem("user", JSON.stringify(userJson));
+            setUser(null);
+            setUser(userJson);
+          }    
+        }   
         window.location.reload();
-
       })
       .catch((err) => {
         console.error(err.message);
@@ -131,17 +139,7 @@ const Profile: React.FC = () => {
   return (
     <>
       <div className="justify-center px-6 py-12 lg:px-8">
-        <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-          <img
-            className="mx-auto h-10 w-auto"
-            src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
-            alt="Your Company"
-          />
-          <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
-            Edit your account
-          </h2>
-        </div>
-
+        
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
             {errorMessage !== "" && (
               <span id="message" style={{ color: "#AA0000", fontSize: "14px", display: "block", textAlign: "center" }}>

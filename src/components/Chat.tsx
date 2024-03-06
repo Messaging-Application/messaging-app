@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { UsersList, Profile, UserContext } from './';
 import {
   ChatProps,
+  UserData,
   MessageData, 
   ChatBodyProps,
   ChatHeaderProps,
@@ -12,9 +13,11 @@ import {
 import axios from 'axios';
 
 const Chat: React.FC<ChatProps> = ({ socket }) => {
-  const [showProfile, setShowProfile] = useState<boolean>(false);
+  const [showProfile, setShowProfile] = useState<boolean>(true);
   const [messages, setMessages] = useState<MessageData[]>([]);
   const lastMessageRef = useRef<HTMLDivElement>(null);
+  const [selectedUser, setSelectedUser] = useState<UserData | null>(null); 
+  const [showUser, setShowUser] = useState<UserData | null>(null); 
 
   useEffect(() => {
     socket.on('messageResponse', (data: MessageData) => setMessages([...messages, data]));
@@ -24,24 +27,28 @@ const Chat: React.FC<ChatProps> = ({ socket }) => {
     lastMessageRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  const handleShowUser = (user: UserData | null) => {
+    setShowUser(user);
+  };
+
   return (
     <div className="chat">
-      <UsersList setShowProfile={setShowProfile}/>
+      <UsersList setShowProfile={setShowProfile} setSelectedUser={setSelectedUser} handleShowUser={handleShowUser}/> 
       <div className="chat__main">
-      <ChatHeader setShowProfile={setShowProfile} />
+      <ChatHeader setShowProfile={setShowProfile} selectedUser={selectedUser} handleShowUser={handleShowUser} setSelectedUser={setSelectedUser}/> 
         {!showProfile && (
           <>
             <ChatBody messages={messages} lastMessageRef={lastMessageRef}/>
-            <ChatFooter socket={socket}/>
+            <ChatFooter socket={socket} selectedUser={selectedUser}/>
           </>
         )}
-        {showProfile && <Profile />}
+        {showProfile && <Profile key={showUser?.id} showUser={showUser}/>}
       </div>
     </div>
   );
 };
 
-const ChatHeader: React.FC<ChatHeaderProps> = ({ setShowProfile }) => {
+const ChatHeader: React.FC<ChatHeaderProps> = ({ setShowProfile, selectedUser, handleShowUser, setSelectedUser }) => {
   const { setUser } = useContext(UserContext) as UserContextType;
   const navigate = useNavigate();
   const handleLeaveChat = async (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -68,8 +75,8 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({ setShowProfile }) => {
   return (
     <>
       <header className="chat__mainHeader">
-        <p>Username</p>
-        <button style={{float:"right", marginRight:"10px"}} className="leaveChat__btn" onClick={() => setShowProfile(true)}>
+        {selectedUser && (<p>{selectedUser?.username} ({selectedUser?.firstName} {selectedUser?.lastName})</p>) }
+        <button style={{float:"right", marginRight:"10px"}} className="leaveChat__btn" onClick={() => {setShowProfile(true); handleShowUser(null); setSelectedUser(null);}}>
           Profile
         </button>
         <button style={{float:"right", marginRight:"10px"}} className="leaveChat__btn" onClick={handleLeaveChat}>
@@ -82,43 +89,51 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({ setShowProfile }) => {
 };
 
 const ChatBody: React.FC<ChatBodyProps> = ({ messages, lastMessageRef }) => {
-  return (
-    <>
-      <div className="message__container">
-        {messages.map((message: MessageData) =>
-          message.name === localStorage.getItem('username') ? (
-            <div className="message__chats" key={message.id}>
-              <p className="sender__name">You</p>
-              <div className="message__sender">
-                <p>{message.text}</p>
+  const userString = localStorage.getItem("user");
+  if (userString) {
+    const userJson = JSON.parse(userString);
+    return (
+      <>
+        <div className="message__container">
+          {messages.map((message: MessageData) =>
+            message.senderId === userJson?.id ? (
+              <div className="message__chats" key={message.messageId}>
+                <p className="sender__name">You</p>
+                <div className="message__sender">
+                  <p>{message.messageContent}</p>
+                </div>
               </div>
-            </div>
-          ) : (
-            <div className="message__chats" key={message.id}>
-              <p>{message.name}</p>
-              <div className="message__recipient">
-                <p>{message.text}</p>
+            ) : (
+              <div className="message__chats" key={message.messageId}>
+                <p>{message.senderId}</p>
+                <div className="message__recipient">
+                  <p>{message.messageContent}</p>
+                </div>
               </div>
-            </div>
-          )
-        )}
-        <div ref={lastMessageRef} />
-      </div>
-    </>
-  );
+            )
+          )}
+          <div ref={lastMessageRef} />
+        </div>
+      </>
+    );
+  }  
+  return null;
 };
 
-const ChatFooter = ({ socket }: ChatProps) => {
+const ChatFooter = ({ socket, selectedUser }: ChatProps) => {
   const [message, setMessage] = useState<string>('');
-
-    const handleSendMessage = (e: React.FormEvent<HTMLFormElement>) => {
+  const userString = localStorage.getItem("user");
+  const user = userString ? JSON.parse(userString) : null;
+  
+  const handleSendMessage = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (message.trim() && localStorage.getItem('username')) {
       socket.emit('message', {
-        text: message,
-        name: localStorage.getItem('username'),
-        id: `${socket.id}${Math.random()}`,
-        socketID: socket.id,
+        messageContent: message,
+        senderId: user?.id,
+        receiverId: selectedUser?.id,
+        // timestamp: Date.now(),
+        messageId: `${socket.id}${Math.random()}`,
       });
     }
     setMessage('');

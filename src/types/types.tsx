@@ -2,7 +2,8 @@ import {  Socket } from 'socket.io-client';
 
 export interface ChatProps {
     socket: Socket;
-  }
+    selectedUser: UserData | null; 
+}
   
 export interface ChatBodyProps {
   messages: MessageData[];
@@ -10,13 +11,26 @@ export interface ChatBodyProps {
 }
   
 export interface MessageData {
-  text: string;
-  name: string;
-  id: string;
+  messageId: number;
+  // chatId: number;
+  messageContent: string;
+  senderId: number;
+  receiverId: number;
+  timestamp: Date;
 }
 
 export interface ChatHeaderProps {
   setShowProfile: React.Dispatch<React.SetStateAction<boolean>>;
+  selectedUser: UserData | null; 
+  handleShowUser: (user: UserData | null) => void; 
+  setSelectedUser: React.Dispatch<React.SetStateAction<UserData | null>>; 
+}
+  
+
+export interface UsersListProps {
+  setShowProfile: React.Dispatch<React.SetStateAction<boolean>>;
+  setSelectedUser: React.Dispatch<React.SetStateAction<UserData | null>>; 
+  handleShowUser: (user: UserData | null) => void; 
 }
   
 
@@ -32,4 +46,8 @@ export interface UserData {
 export interface UserContextType {
   user: UserData | null;
   setUser: React.Dispatch<React.SetStateAction<UserData | null>>;
+}
+
+export interface ProfileProps {
+  showUser:  UserData | null; 
 }

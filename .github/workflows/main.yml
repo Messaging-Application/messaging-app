@@ -6,8 +6,6 @@ on:
   pull_request:
     branches:
       - "**"
-env:
-  IMAGE_NAME: dasha12678/messaging-app:latest
   
 jobs:
   build:
@@ -35,4 +33,4 @@ jobs:
       with:
         context: .
         push: true
-        tags: $IMAGE_NAME
+        tags: dasha12678/messaging-app:latest

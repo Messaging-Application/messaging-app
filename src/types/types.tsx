@@ -25,7 +25,6 @@ export interface ChatHeaderProps {
   handleShowUser: (user: UserData | null) => void; 
   setSelectedUser: React.Dispatch<React.SetStateAction<UserData | null>>; 
 }
-  
 
 export interface UsersListProps {
   setShowProfile: React.Dispatch<React.SetStateAction<boolean>>;
@@ -33,7 +32,6 @@ export interface UsersListProps {
   handleShowUser: (user: UserData | null) => void; 
 }
   
-
 export interface UserData {
   id: number;
   firstName: string;

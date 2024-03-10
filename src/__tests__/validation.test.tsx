@@ -56,7 +56,7 @@ import {
         });
       
         it('should throw an error when passwords do not match', () => {
-          expect(() => passwordsMatch('password', 'confirm')).toThrow("Password don't match");
+          expect(() => passwordsMatch('password', 'confirm')).toThrow("Passwords don't match");
         });
       
         it('should return true when passwords match', () => {

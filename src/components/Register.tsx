@@ -1,7 +1,5 @@
 import '../index.css'
-
-import { useState } from "react";
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   validateEmail, 
   validatePassword,  
@@ -12,6 +10,8 @@ import {
 } from "../utils";
 
 const Register: React.FC = () => {
+
+  // State variables for form inputs and error message
   const [username, setUsername] = useState<string>("");
   const [firstname, setFirstname] = useState<string>("");
   const [lastname, setLastname] = useState<string>("");
@@ -20,6 +20,7 @@ const Register: React.FC = () => {
   const [confirm, setConfirm] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string>("");
 
+  // Event handlers for input changes
   const usernameChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
     setUsername(event.target.value);
   };
@@ -35,50 +36,60 @@ const Register: React.FC = () => {
   const passwordChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
     setPassword(event.target.value);
   };
-
   const confirmChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
     setConfirm(event.target.value);
   };
 
+  // Event handler for form submission
   const submitHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
-    setErrorMessage("");
-    validateUsername(username);
-    validateName(firstname);
-    validateName(lastname);
-    validateEmail(email);
-    validatePassword(password); 
-    passwordsMatch(password, confirm);
-    // if no errors
-    const body = {
-      "username": username,
-      "password": password,
-      "email": email,
-      "firstName": firstname,
-      "lastName": lastname
-    };
-    console.log(body);
-    fetch("http://localhost:8080/auth/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    })
-    .then((response) => {
-      console.log('Response status code:', response.status); 
-      if (!response.ok) {
-        response.json().then(data => {
-          console.log(data.message); 
-          setErrorMessage(data.message);
-        })
-        throw new Error("Failed to register");
-      }
-      // Redirect user to login page
-      window.location.href = "/";
-    })
-    .catch((err) => {
-      console.error(err.message);
-    });
+    try {
+      // Validate form inputs
+      setErrorMessage("");
+      validateUsername(username);
+      validateName(firstname);
+      validateName(lastname);
+      validateEmail(email);
+      validatePassword(password); 
+      passwordsMatch(password, confirm);
 
+      // if no errors, submit the form
+      const body = {
+        "username": username,
+        "password": password,
+        "email": email,
+        "firstName": firstname,
+        "lastName": lastname
+      };
+      fetch("http://localhost:8080/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      })
+      .then((response) => {
+        console.log('Response status code:', response.status); 
+        if (!response.ok) {
+          // If there's an error, set the error message
+          response.json().then(data => {
+            setErrorMessage(data.message);
+          }).catch((err) => {
+            console.error("Error parsing JSON response:", err);
+            setErrorMessage("Failed to register.");
+          });
+          throw new Error("Failed to register");
+        }
+        // Redirect user to login page after successful registration
+        window.location.href = "/";
+      })
+      .catch((err) => {
+        console.error(err.message);
+        setErrorMessage("Failed to register.");
+      });
+    } catch (error: any) {
+      // Handle the error
+      console.error('An error occurred:', error.message);
+      setErrorMessage(error.message);
+    }
   };
 
   return (
@@ -96,8 +107,9 @@ const Register: React.FC = () => {
         </div>
 
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+            {/* Show error message if it exists */}
             {errorMessage !== "" && (
-              <span id="message" style={{ color: "#AA0000", fontSize: "14px", display: "block", textAlign: "center" }}>
+              <span id="message" style={{ color: "#AA0000", fontSize: "14px", display: "block", textAlign: "center" }} aria-live="assertive">
                 {errorMessage}
               </span>
             )} 
@@ -108,6 +120,7 @@ const Register: React.FC = () => {
               </label>
               <div className="mt-2">
                 <input
+                  aria-label="Username"
                   id="username"
                   name="username"
                   type="text"
@@ -130,6 +143,7 @@ const Register: React.FC = () => {
                 </label>
                 <div className="mt-2">
                   <input
+                    aria-label="Firstname"
                     id="firstname"
                     name="firstname"
                     type="text"
@@ -150,6 +164,7 @@ const Register: React.FC = () => {
                 </label>
                 <div className="mt-2">
                   <input
+                    aria-label="Lastname"
                     id="lastname"
                     name="lastname"
                     type="text"
@@ -173,6 +188,7 @@ const Register: React.FC = () => {
               </div>
               <div className="mt-2">
                 <input
+                  aria-label="Email"
                   id="email"
                   name="email"
                   type="email"
@@ -194,6 +210,7 @@ const Register: React.FC = () => {
               </div>
               <div className="mt-2">
                 <input
+                  aria-label="Password"
                   id="password"
                   name="password"
                   type="password"
@@ -215,6 +232,7 @@ const Register: React.FC = () => {
               </div>
               <div className="mt-2">
                 <input
+                  aria-label="Confirm Password"
                   id="confirm"
                   name="password"
                   type="password"
@@ -225,17 +243,18 @@ const Register: React.FC = () => {
                   placeholder="Confirm password"
                   className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 />
-                
+                {/* if checked, show/hide password */}
                 <div className="flex mt-4">
                   <input data-hs-toggle-password='{
                       "target": "#password, #confirm"
                     }' onChange={togglePasswordConfirm} id="hs-toggle-password-checkbox" type="checkbox" className="shrink-0 mt-0.5 border-gray-200 rounded"/>
-                  <label htmlFor="hs-toggle-password-checkbox" className="text-sm text-gray-500 ms-3 dark:text-gray-400">Show password</label>
+                  <label htmlFor="hs-toggle-password-checkbox" className="text-sm text-gray-500 ms-3 dark:text-gray-400" aria-label="Show Password">Show password</label>
                 </div>
                 
               </div>
             </div>
 
+            {/* if pressed, submit form */}
             <div>
               <button
                 type="submit"

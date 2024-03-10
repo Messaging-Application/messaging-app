@@ -71,14 +71,12 @@ describe('Profile component', () => {
     const emailInput = getByLabelText('Email');
     const firstnameInput = getByLabelText('Firstname');
     const lastnameInput = getByLabelText('Lastname');
-    // const signUpButton = getByText('Sign up');
 
     fireEvent.change(passwordInput, { target: { value: 'testpassword' } });
     fireEvent.change(confirmInput, { target: { value: 'testpassword2' } });
     fireEvent.change(emailInput, { target: { value: 'testuser@gmail.com' } });
     fireEvent.change(firstnameInput, { target: { value: 'testfisrtname' } });
     fireEvent.change(lastnameInput, { target: { value: 'testlastname' } });
-    // fireEvent.click(signUpButton);
   });
 
 });

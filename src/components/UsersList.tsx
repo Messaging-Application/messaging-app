@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import {
-    UsersListProps,
-    UserData,
-  } from "../types";
+import { UsersListProps, UserData } from "../types";
 import "../index.css"
 
 const UsersList: React.FC<UsersListProps> = ({ setShowProfile, setSelectedUser, handleShowUser }) => {
+    // State variables
     const [users, setUsers] = useState<UserData[]>([]);
     const [currentPage, setCurrentPage] = useState(0);
     const [totalPages] = useState(3);
+    // Get user from local storage
     const userString = localStorage.getItem("user");
     const user: UserData | null = userString ? JSON.parse(userString) : null;    
+
     useEffect(() => {
       const fetchUsers = async () => {
         try {
@@ -32,9 +32,10 @@ const UsersList: React.FC<UsersListProps> = ({ setShowProfile, setSelectedUser, 
           // Parse the response body as JSON
           const responseBody = await response.json();
 
+          // Update users state with new data
+          // Do not add duplicates
           for (const key in responseBody) {
             const parsedResponse = JSON.parse(responseBody[key]);
-            console.log(parsedResponse.user2);
             setUsers(users => {
               const userSet = new Set(users.map(user => user.id));
               if (!userSet.has(parsedResponse.user2.id)) {
@@ -42,31 +43,31 @@ const UsersList: React.FC<UsersListProps> = ({ setShowProfile, setSelectedUser, 
               } else {
                   return users;
               }
-          });
-          
+            });
           }
 
         } catch (error) {
           console.error('Error fetching users:', error);
         }
       };
-    
       fetchUsers();
-    }, [currentPage, totalPages]);
+    }, [currentPage, totalPages]); // the dependencies
     
+    // Function to navigate to a specific page
     const goToPage = (page: number) => {
       setCurrentPage(page);
-      setUsers([]); // Clear existing data before fetching new data
+      // Clear existing data before fetching new data
+      setUsers([]); 
     };
 
   
   
     return (
-      <div className="chat__sidebar">
+      <div className="chatSidebar">
         <h2>CHAT APP</h2>
         <div>
-          <h4 className="chat__header">Users</h4>
-          <div className="chat__users">
+          <h4 className="chatHeader">Users</h4>
+          <div className="chatUsers">
           {!user?.roles.includes("ROLE_ADMIN") ? (
             // If the user is not an admin, render the simple button
             users.map((friend: UserData, index) => (
@@ -81,7 +82,7 @@ const UsersList: React.FC<UsersListProps> = ({ setShowProfile, setSelectedUser, 
                 <button onClick={() => {setShowProfile(false); setSelectedUser(friend);}} style={{width:"100%", backgroundColor:"transparent", textAlign:"left", paddingLeft:"6px", height:"30pt", color:"grey", fontSize:"15px"}}>
                   <p style={{fontSize:"18px", color:"black"}}><b>{friend.username}</b></p>
                 </button>
-                <button style={{float:"right", marginRight:"10px"}} className="leaveChat__btn" onClick={() => {setShowProfile(true); handleShowUser(friend)}}>
+                <button style={{float:"right", marginRight:"10px"}} className="leaveChatButton" onClick={() => {setShowProfile(true); handleShowUser(friend)}}>
                   Profile
                 </button>
               </div>

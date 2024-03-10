@@ -32,7 +32,7 @@ export const passwordsMatch = (password: string, confirm: string): true => {
         throw new Error('Please confirm the password.');
     }
     if (confirm != password) {
-        throw new Error("Password don't match");
+        throw new Error("Passwords don't match");
     }
     return true;
 }

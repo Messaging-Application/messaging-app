@@ -16,9 +16,12 @@ jobs:
       uses: actions/setup-node@v3
       with:
         node-version: 20
-    - run: npm install
-    - run: npm run lint
-    - run: npm run test
+    - name: Install dependencies
+      run: npm install
+    - name: Run lint tests
+      run: npm run lint
+    - name: Run tests
+      run: npm run test
     - name: Login to Docker Hub
       uses: docker/login-action@v3.0.0
       with:
@@ -34,8 +37,6 @@ jobs:
         context: .
         push: true
         tags: dasha12678/messaging-app:latest
-    - name: Install GitLeaks
+    - name: Run GitLeaks Docker container
       run: |
-        curl -sSfL https://raw.githubusercontent.com/zricethezav/gitleaks/master/install.sh | sudo bash -s -- -b /usr/local/bin v7.6.1
-    - name: Run GitLeaks
-      run: gitleaks --repo-path . --report-format=csv --report=gitleaks-report.csv
+        docker run --rm -v $(pwd):/repo zricethezav/gitleaks --repo-path /repo --report-format csv --report /repo/gitleaks-report.csv

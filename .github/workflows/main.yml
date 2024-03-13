@@ -34,3 +34,8 @@ jobs:
         context: .
         push: true
         tags: dasha12678/messaging-app:latest
+    - name: Install GitLeaks
+      run: |
+        curl -sSfL https://raw.githubusercontent.com/zricethezav/gitleaks/master/install.sh | sudo bash -s -- -b /usr/local/bin v7.6.1
+    - name: Run GitLeaks
+      run: gitleaks --repo-path . --report-format=csv --report=gitleaks-report.csv

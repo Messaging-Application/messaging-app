@@ -60,7 +60,12 @@ const Chat: React.FC<ChatProps> = ({ socket }) => {
 const ChatHeader: React.FC<ChatHeaderProps> = ({ setShowProfile, selectedUser, handleShowUser, setSelectedUser }) => {
   const { setUser } = useContext(UserContext) as UserContextType;
   const navigate = useNavigate();
-  
+  const toggleSidebar = () => {
+    const sidebar = document.querySelector('.chatSidebar');
+    if (sidebar) {
+      sidebar.classList.toggle('sidebar-open');
+    }
+  };
   // Function to handle leaving the chat (logging out)
   const handleLeaveChat = async (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
@@ -90,6 +95,9 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({ setShowProfile, selectedUser, h
   return (
     <>
       <header className="chatMainHeader">
+        <button style={{float:"right", marginRight:"10px"}} className="menu-button" onClick={toggleSidebar} aria-label="View Menu">
+          Menu
+        </button>
         {selectedUser && (<p>{selectedUser?.username} ({selectedUser?.firstName} {selectedUser?.lastName})</p>) }
         <button style={{float:"right", marginRight:"10px"}} className="leaveChatButton" onClick={() => {setShowProfile(true); handleShowUser(null); setSelectedUser(null);}} aria-label="View Profile">
           Profile

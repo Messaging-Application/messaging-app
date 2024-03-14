@@ -21,10 +21,10 @@ const Chat: React.FC<ChatProps> = ({ socket }) => {
 
   // Effect to listen for incoming messages from the socket
   useEffect(() => {
-    socket.on('messageResponse', (data: MessageData) => setMessages(prevMessages => [...prevMessages, data]));
-    // Clean up the event listener when the component unmounts
-    return () => {
-      socket.off('messageResponse');
+
+    socket.onmessage = (event) => {
+      const newMessage = JSON.parse(event.data);
+      setMessages(prevMessages => [...prevMessages, newMessage]);
     };
   }, [socket]);
 
@@ -44,10 +44,10 @@ const Chat: React.FC<ChatProps> = ({ socket }) => {
     <div className="chat">
       <UsersList setShowProfile={setShowProfile} setSelectedUser={setSelectedUser} handleShowUser={handleShowUser}/> 
       <div className="chatMain">
-        <ChatHeader setShowProfile={setShowProfile} selectedUser={selectedUser} handleShowUser={handleShowUser} setSelectedUser={setSelectedUser}/> 
+        <ChatHeader socket={socket} setShowProfile={setShowProfile} selectedUser={selectedUser} handleShowUser={handleShowUser} setSelectedUser={setSelectedUser}/> 
         {!showProfile && (
           <>
-            <ChatBody messages={messages} lastMessageRef={lastMessageRef}/>
+            <ChatBody messages={messages} lastMessageRef={lastMessageRef} selectedUser={selectedUser}/>
             <ChatFooter socket={socket} selectedUser={selectedUser}/>
           </>
         )}
@@ -57,7 +57,7 @@ const Chat: React.FC<ChatProps> = ({ socket }) => {
   );
 };
 
-const ChatHeader: React.FC<ChatHeaderProps> = ({ setShowProfile, selectedUser, handleShowUser, setSelectedUser }) => {
+const ChatHeader: React.FC<ChatHeaderProps> = ({ socket, setShowProfile, selectedUser, handleShowUser, setSelectedUser }) => {
   const { setUser } = useContext(UserContext) as UserContextType;
   const navigate = useNavigate();
   // Function to handle leaving the chat (logging out)
@@ -76,6 +76,7 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({ setShowProfile, selectedUser, h
       });
       
       // Clear user data and navigate to login page
+      socket.close();
       localStorage.removeItem('user');
       localStorage.removeItem('jwt');
       setUser(null);
@@ -102,7 +103,7 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({ setShowProfile, selectedUser, h
   );
 };
 
-const ChatBody: React.FC<ChatBodyProps> = ({ messages, lastMessageRef }) => {
+const ChatBody: React.FC<ChatBodyProps> = ({ messages, lastMessageRef, selectedUser }) => {
   const userString = localStorage.getItem("user");
   if (userString) {
     const userJson = JSON.parse(userString);
@@ -110,18 +111,18 @@ const ChatBody: React.FC<ChatBodyProps> = ({ messages, lastMessageRef }) => {
       <>
         <div className="messageContainer">
           {messages.map((message: MessageData) =>
-            message.senderId === userJson?.id ? (
-              <div className="messageChats" key={message.messageId}>
+            message.sender_id === String(userJson?.id) ? (
+              <div className="messageChats">
                 <p className="senderName">You</p>
                 <div className="messageSender">
-                  <p>{message.messageContent}</p>
+                  <p>{message.message}</p>
                 </div>
               </div>
             ) : (
-              <div className="messageChats" key={message.messageId}>
-                <p>{message.senderId}</p>
+              <div className="messageChats">
+                <p>{selectedUser?.username}</p>
                 <div className="messageRecipient">
-                  <p>{message.messageContent}</p>
+                  <p>{message.message}</p>
                 </div>
               </div>
             )
@@ -144,14 +145,16 @@ const ChatFooter = ({ socket, selectedUser }: ChatProps) => {
   const handleSendMessage = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // Check if message is not empty and user is logged in
-    if (message.trim() && localStorage.getItem('username')) {
-      // Emit message event to the socket
-      socket.emit('message', {
-        messageContent: message,
-        senderId: user?.id,
-        receiverId: selectedUser?.id,
-        messageId: `${socket.id}${Math.random()}`,
-      });
+    if (message.trim() && localStorage.getItem('user')) {
+
+      const msg = {
+        "action" : "sendMessage",
+        "message" : message,
+        "sender_id": String(user?.id),
+        "receiver_id": selectedUser?.id
+      };
+      socket.send(JSON.stringify(msg));
+
     }
     // Clear the message input
     setMessage('');
@@ -167,7 +170,7 @@ const ChatFooter = ({ socket, selectedUser }: ChatProps) => {
           onChange={(e) => setMessage(e.target.value)}
           aria-label="Type your message"
         />
-        <button className="sendButton">SEND</button>
+        <button type="submit" className="sendButton">SEND</button>
       </form>
     </div>
   );

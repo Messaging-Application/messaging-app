@@ -79,7 +79,7 @@ const UsersList: React.FC<UsersListProps> = ({ setShowProfile, setSelectedUser, 
                                 <button onClick={() => {setShowProfile(false); setSelectedUser(friend);}} style={{width:"100%", backgroundColor:"transparent", textAlign:"left", paddingLeft:"6px", height:"30pt", color:"grey", fontSize:"15px"}}>
                                     <p style={{fontSize:"18px", color:"black"}}><b>{friend.username}</b></p>
                                 </button>
-                                <button style={{float:"right", marginRight:"10px"}} className="leaveChatButton" onClick={() => {setShowProfile(true); handleShowUser(friend)}}>
+                                <button style={{float:"right"}} className="leaveChatButton" onClick={() => {setShowProfile(true); handleShowUser(friend)}}>
                                     Profile
                                 </button>
                             </div>

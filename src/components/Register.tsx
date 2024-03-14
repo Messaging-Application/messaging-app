@@ -1,4 +1,3 @@
-import '../index.css'
 import React, { useState } from 'react';
 import { 
   validateEmail, 
@@ -8,6 +7,7 @@ import {
   validateName,  
   togglePasswordConfirm
 } from "../utils";
+import '../index.css';
 
 const Register: React.FC = () => {
 
@@ -41,7 +41,7 @@ const Register: React.FC = () => {
   };
 
   // Event handler for form submission
-  const submitHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
+  const submitHandler = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     try {
       // Validate form inputs
@@ -113,7 +113,7 @@ const Register: React.FC = () => {
                 {errorMessage}
               </span>
             )} 
-          <form className="space-y-6" action="#" method="POST">
+          <form className="space-y-6" action="#" method="POST" onSubmit={submitHandler}>
             <div>
               <label htmlFor="username" className="block text-sm font-medium leading-6 text-gray-900">
                 Username
@@ -258,7 +258,6 @@ const Register: React.FC = () => {
             <div>
               <button
                 type="submit"
-                onClick={submitHandler}
                 className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
               >
                 Sign up

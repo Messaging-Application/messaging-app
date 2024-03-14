@@ -1,25 +1,22 @@
-import {  Socket } from 'socket.io-client';
-
 export interface ChatProps {
-    socket: Socket;
+    socket: WebSocket;
     selectedUser: UserData | null; 
 }
   
 export interface ChatBodyProps {
   messages: MessageData[];
   lastMessageRef: React.RefObject<HTMLDivElement>;
+  selectedUser: UserData | null; 
 }
   
 export interface MessageData {
-  messageId: number;
-  // chatId: number;
-  messageContent: string;
-  senderId: number;
-  receiverId: number;
-  timestamp: Date;
+  message : string;
+  receiver_id: string;
+  sender_id: string;
 }
 
 export interface ChatHeaderProps {
+  socket: WebSocket;
   setShowProfile: React.Dispatch<React.SetStateAction<boolean>>;
   selectedUser: UserData | null; 
   handleShowUser: (user: UserData | null) => void; 

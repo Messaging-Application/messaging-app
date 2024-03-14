@@ -11,6 +11,25 @@ import {
   togglePasswordConfirm
 } from "../utils";
 
+const DeleteModal: React.FC<{ onClose: () => void, onDelete: (event: React.MouseEvent<HTMLButtonElement>) => Promise<void> }> = ({ onClose, onDelete }) => {
+  return (
+    <div className="modal">
+      <div className="modal-content">
+        <span className="close" onClick={onClose}>&times;</span>
+        <p>Are you sure you want to delete your account?</p>
+        <div>
+        <button style={{marginRight:"10px"}} className="leaveChatButton" onClick={onDelete} aria-label="Confirm deletion">
+          Yes
+        </button>
+        <button className="leaveChatButton" onClick={onClose} aria-label="Cancel deletion">
+          Cancel
+        </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const Profile: React.FC<ProfileProps> = ({ showUser }) => {
   // Context to access user data and set user
   const { setUser } = useContext(UserContext) as UserContextType;
@@ -33,6 +52,7 @@ const Profile: React.FC<ProfileProps> = ({ showUser }) => {
   const [confirm, setConfirm] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [successMessage, setSuccessMessage] = useState<string>("");
+  const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
 
   // Event handlers for input changes
   const firstnameChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -321,23 +341,25 @@ const Profile: React.FC<ProfileProps> = ({ showUser }) => {
               <button
                 type="submit"
                 onClick={submitHandler}
+                aria-label="Update Profile"
                 className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
               >
                 Update
               </button>
             </div>
-
-            {/* if pressed, delete account */}
-            <button
-                style={{ color: "#4F46E5", background: "white", borderColor: "#4F46E5" }}                
-                type="submit"
-                onClick={deleteAccount}
-                className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-              >
-                Delete account
-              </button>
           </form>
           
+          <button
+              style={{ color: "#4F46E5", background: "white", borderColor: "#4F46E5", marginTop: "7px" }}                
+              onClick={() => setShowDeleteModal(true)}
+              aria-label="Delete Account"
+              className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            >
+              Delete account
+            </button>
+          
+            {/* Delete Account Modal */}
+            {showDeleteModal && <DeleteModal onClose={() => setShowDeleteModal(false)} onDelete={deleteAccount} />}
         </div>
       </div>
       </div>

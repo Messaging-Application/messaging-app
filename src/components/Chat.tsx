@@ -9,6 +9,7 @@ import {
   ChatBodyProps,
   ChatHeaderProps,
   UserContextType,
+  ChatFooterProps
 } from "../types";
 import axios from 'axios';
 
@@ -17,16 +18,26 @@ const Chat: React.FC<ChatProps> = ({ socket }) => {
   const [messages, setMessages] = useState<MessageData[]>([]);
   const lastMessageRef = useRef<HTMLDivElement>(null);
   const [selectedUser, setSelectedUser] = useState<UserData | null>(null); 
+  const [chatId, setChatId] = useState<string>(""); 
   const [showUser, setShowUser] = useState<UserData | null>(null); 
 
   // Effect to listen for incoming messages from the socket
   useEffect(() => {
-
+    setMessages([]);
+    console.log("selected user");
     socket.onmessage = (event) => {
+      console.log("listening");
       const newMessage = JSON.parse(event.data);
-      setMessages(prevMessages => [...prevMessages, newMessage]);
+      // const userString = localStorage.getItem("user");
+      // if (userString) {
+      //   const userJson = JSON.parse(userString);
+      //   console.log("checking");
+      //   if ((newMessage.sender_id === String(userJson.id) && newMessage.receiver_id === String(selectedUser?.id)) || (newMessage.sender_id === String(selectedUser?.id) && newMessage.receiver_id === String(userJson.id))) {
+          setMessages(prevMessages => [...prevMessages, newMessage]);
+        // }
+      // }
     };
-  }, [socket]);
+  }, [socket, selectedUser]);
 
   // Effect to scroll to the last message when messages change
   useEffect(() => {
@@ -42,13 +53,13 @@ const Chat: React.FC<ChatProps> = ({ socket }) => {
 
   return (
     <div className="chat">
-      <UsersList setShowProfile={setShowProfile} setSelectedUser={setSelectedUser} handleShowUser={handleShowUser}/> 
+      <UsersList setShowProfile={setShowProfile} setSelectedUser={setSelectedUser} handleShowUser={handleShowUser} setChatId={setChatId}/> 
       <div className="chatMain">
         <ChatHeader socket={socket} setShowProfile={setShowProfile} selectedUser={selectedUser} handleShowUser={handleShowUser} setSelectedUser={setSelectedUser}/> 
         {!showProfile && (
           <>
             <ChatBody messages={messages} lastMessageRef={lastMessageRef} selectedUser={selectedUser}/>
-            <ChatFooter socket={socket} selectedUser={selectedUser}/>
+            <ChatFooter socket={socket} selectedUser={selectedUser} chatId={chatId}/>
           </>
         )}
         {showProfile && <Profile key={showUser?.id} showUser={showUser}/>}
@@ -110,16 +121,16 @@ const ChatBody: React.FC<ChatBodyProps> = ({ messages, lastMessageRef, selectedU
     return (
       <>
         <div className="messageContainer">
-          {messages.map((message: MessageData) =>
+          {messages.map((message: MessageData, index) =>
             message.sender_id === String(userJson?.id) ? (
-              <div className="messageChats">
+              <div className="messageChats" key={index}>
                 <p className="senderName">You</p>
                 <div className="messageSender">
                   <p>{message.message}</p>
                 </div>
               </div>
             ) : (
-              <div className="messageChats">
+              <div className="messageChats" key={index}>
                 <p>{selectedUser?.username}</p>
                 <div className="messageRecipient">
                   <p>{message.message}</p>
@@ -135,11 +146,12 @@ const ChatBody: React.FC<ChatBodyProps> = ({ messages, lastMessageRef, selectedU
   return null;
 };
 
-const ChatFooter = ({ socket, selectedUser }: ChatProps) => {
+const ChatFooter = ({ socket, selectedUser, chatId }: ChatFooterProps) => {
   const [message, setMessage] = useState<string>('');
   // Get user data from local storage
   const userString = localStorage.getItem("user");
   const user = userString ? JSON.parse(userString) : null;
+
   
   // Function to handle sending a message
   const handleSendMessage = (e: React.FormEvent<HTMLFormElement>) => {
@@ -151,8 +163,10 @@ const ChatFooter = ({ socket, selectedUser }: ChatProps) => {
         "action" : "sendMessage",
         "message" : message,
         "sender_id": String(user?.id),
-        "receiver_id": selectedUser?.id
+        "receiver_id": selectedUser?.id,
+        "chat_id": chatId
       };
+      console.log(msg);
       socket.send(JSON.stringify(msg));
 
     }

@@ -8,6 +8,12 @@ export interface ChatBodyProps {
   lastMessageRef: React.RefObject<HTMLDivElement>;
   selectedUser: UserData | null; 
 }
+
+export interface ChatFooterProps {
+  socket: WebSocket;
+  selectedUser: UserData | null; 
+  chatId: string;
+}
   
 export interface MessageData {
   message : string;
@@ -27,6 +33,7 @@ export interface UsersListProps {
   setShowProfile: React.Dispatch<React.SetStateAction<boolean>>;
   setSelectedUser: React.Dispatch<React.SetStateAction<UserData | null>>; 
   handleShowUser: (user: UserData | null) => void; 
+  setChatId: React.Dispatch<React.SetStateAction<string>>;
 }
   
 export interface UserData {
@@ -45,4 +52,9 @@ export interface UserContextType {
 
 export interface ProfileProps {
   showUser:  UserData | null; 
+}
+
+export interface UserWithChatData {
+  user: UserData;
+  chat_id: string;
 }

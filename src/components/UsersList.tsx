@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { UsersListProps, UserData } from "../types";
+import { UsersListProps, UserData, UserWithChatData } from "../types";
 import "../index.css";
 
-const UsersList: React.FC<UsersListProps> = ({ setShowProfile, setSelectedUser, handleShowUser }) => {
+const UsersList: React.FC<UsersListProps> = ({ setShowProfile, setSelectedUser, handleShowUser, setChatId }) => {
     // State variables
-    const [users, setUsers] = useState<UserData[]>([]);
+    const [users, setUsers] = useState<UserWithChatData[]>([]);
     const [currentPage, setCurrentPage] = useState(0);
     const [totalPages] = useState(3);
     const [isLoading, setIsLoading] = useState(false); // State to track loading state
@@ -37,14 +37,21 @@ const UsersList: React.FC<UsersListProps> = ({ setShowProfile, setSelectedUser, 
                 // Update users state with new data
                 // Do not add duplicates
                 for (const key in responseBody) {
+                    const tokens = key.split("chat:");
                     const parsedResponse = JSON.parse(responseBody[key]);
                     setUsers(users => {
-                        const userSet = new Set(users.map(user => user.id));
-                        if (!userSet.has(parsedResponse.user2.id)) {
-                            return [...users, parsedResponse.user2];
-                        } else {
-                            return users;
+                        const userSet = new Set(users.map(user => user.user.id));
+                        if (String(user?.id) === parsedResponse.user2.id) {
+                            if (!userSet.has(parsedResponse.user1.id)) {
+                                return [...users, { user: parsedResponse.user1, chat_id: tokens[1] }];
+                            }
+                        } else if (String(user?.id) === parsedResponse.user1.id) {
+                            if (!userSet.has(parsedResponse.user2.id)) {
+                                return [...users, { user: parsedResponse.user2, chat_id: tokens[1] }];
+                            }
                         }
+                        // Return the current state when conditions don't match
+                        return users; 
                     });
                 }
 
@@ -56,7 +63,7 @@ const UsersList: React.FC<UsersListProps> = ({ setShowProfile, setSelectedUser, 
             }
         };
         fetchUsers();
-    }, [currentPage, totalPages]); // the dependencies
+    }, [currentPage, totalPages, user?.id]); // the dependencies
   
   
     return (
@@ -67,19 +74,19 @@ const UsersList: React.FC<UsersListProps> = ({ setShowProfile, setSelectedUser, 
                 <div className="chatUsers" style={{ maxHeight: "70vh", overflowY: "auto" }}>
                     {!user?.roles.includes("ROLE_ADMIN") ? (
                         // If the user is not an admin, render the simple button
-                        users.map((friend: UserData, index) => (
-                            <button key={index} onClick={() => {setShowProfile(false); setSelectedUser(friend); }} style={{width:"100%", backgroundColor:"transparent", textAlign:"left", paddingLeft:"6px", height:"30pt", color:"grey", fontSize:"15px"}}>
-                                <p style={{fontSize:"18px", color:"black"}}><b>{friend.username}</b></p>
+                        users.map((friend: UserWithChatData, index) => (
+                            <button key={index} onClick={() => {setShowProfile(false); setSelectedUser(friend.user); setChatId(friend.chat_id); }} style={{width:"100%", backgroundColor:"transparent", textAlign:"left", paddingLeft:"6px", height:"30pt", color:"grey", fontSize:"15px"}}>
+                                <p style={{fontSize:"18px", color:"#5072A7"}}>{friend.user.username}</p>
                             </button>
                         ))
                     ) : (
                         // If the user is an admin, render the button with profile option
-                        users.map((friend: UserData, index) => (
+                        users.map((friend: UserWithChatData, index) => (
                             <div key={index} className="container">
-                                <button onClick={() => {setShowProfile(false); setSelectedUser(friend);}} style={{width:"100%", backgroundColor:"transparent", textAlign:"left", paddingLeft:"6px", height:"30pt", color:"grey", fontSize:"15px"}}>
-                                    <p style={{fontSize:"18px", color:"black"}}><b>{friend.username}</b></p>
+                                <button onClick={() => {setShowProfile(false); setSelectedUser(friend.user);}} style={{width:"100%", backgroundColor:"transparent", textAlign:"left", paddingLeft:"6px", height:"30pt", color:"grey", fontSize:"15px"}}>
+                                    <p style={{fontSize:"18px", color:"#5072A7"}}>{friend.user.username}</p>
                                 </button>
-                                <button style={{float:"right"}} className="leaveChatButton" onClick={() => {setShowProfile(true); handleShowUser(friend)}}>
+                                <button style={{float:"right"}} className="leaveChatButton" onClick={() => {setShowProfile(true); handleShowUser(friend.user); setChatId(friend.chat_id);}}>
                                     Profile
                                 </button>
                             </div>

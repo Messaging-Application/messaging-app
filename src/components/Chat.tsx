@@ -9,7 +9,8 @@ import {
   ChatBodyProps,
   ChatHeaderProps,
   UserContextType,
-  ChatFooterProps
+  ChatFooterProps,
+  MessageDataDetailed,
 } from "../types";
 import axios from 'axios';
 
@@ -21,9 +22,52 @@ const Chat: React.FC<ChatProps> = ({ socket }) => {
   const [chatId, setChatId] = useState<string>(""); 
   const [showUser, setShowUser] = useState<UserData | null>(null); 
 
+  
+  useEffect(() => {
+    const fetchMessages = async () => {
+        if (chatId) {
+          try {
+            console.log(chatId);
+              const response = await fetch(`http://ec2-35-158-93-2.eu-central-1.compute.amazonaws.com:8080/message/${chatId}`, {
+                  method: "GET",
+                  credentials: "include", 
+                  headers: { 
+                      "Content-Type": "application/json",
+                      'Authorization': 'Bearer ' + localStorage.getItem("jwt"), 
+                  },
+              });
+              
+              console.log('Response status code:', response.status); 
+              
+              if (!response.ok) {
+                  throw new Error("Failed to update messages");
+              }
+      
+              // Parse the response body as JSON
+              const responseBody: MessageDataDetailed[]  = await response.json();
+              console.log(responseBody);
+
+              // Transforming messages
+              const transformedMessages: MessageData[] = responseBody.map((message: MessageDataDetailed) => ({
+                message: message.message_content,
+                receiver_id: message.receiver_id.toString(), // Assuming receiver_id is a string
+                sender_id: message.sender_id.toString() // Assuming sender_id is a string
+              }));
+
+              // Setting transformed messages in state
+              setMessages(transformedMessages);
+
+  
+          } catch (error) {
+              console.error('Error fetching users:', error);
+          }
+        }
+    };
+    fetchMessages();
+  }, [chatId]); // the dependencies
+
   // Effect to listen for incoming messages from the socket
   useEffect(() => {
-    setMessages([]);
     socket.onmessage = (event) => {
       const newMessage = JSON.parse(event.data);
       // const userString = localStorage.getItem("user");

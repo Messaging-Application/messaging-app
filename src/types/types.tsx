@@ -21,6 +21,12 @@ export interface MessageData {
   sender_id: string;
 }
 
+export interface MessageDataDetailed {
+  message_content : string;
+  receiver_id: string;
+  sender_id: string;
+}
+
 export interface ChatHeaderProps {
   socket: WebSocket;
   setShowProfile: React.Dispatch<React.SetStateAction<boolean>>;

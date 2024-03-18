@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import {
@@ -24,7 +24,7 @@ const App = () => {
     if (user && !socket) {
       const userJson = JSON.parse(user);
       console.log(userJson.id);
-      const newSocket = new WebSocket('wss://2ezs7zsjrl.execute-api.eu-central-1.amazonaws.com/production?userId=' + userJson.id);
+      const newSocket = new WebSocket('wss://2ezs7zsjrl.execute-api.eu-central-1.amazonaws.com/prod?userId=' + userJson.id);
       setSocket(newSocket);
     }
   }, [socket]);

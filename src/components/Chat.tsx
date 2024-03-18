@@ -24,9 +24,7 @@ const Chat: React.FC<ChatProps> = ({ socket }) => {
   // Effect to listen for incoming messages from the socket
   useEffect(() => {
     setMessages([]);
-    console.log("selected user");
     socket.onmessage = (event) => {
-      console.log("listening");
       const newMessage = JSON.parse(event.data);
       // const userString = localStorage.getItem("user");
       // if (userString) {
@@ -53,7 +51,7 @@ const Chat: React.FC<ChatProps> = ({ socket }) => {
 
   return (
     <div className="chat">
-      <UsersList setShowProfile={setShowProfile} setSelectedUser={setSelectedUser} handleShowUser={handleShowUser} setChatId={setChatId}/> 
+      <UsersList setShowProfile={setShowProfile} setSelectedUser={setSelectedUser} handleShowUser={handleShowUser} setChatId={setChatId} socket={socket}/> 
       <div className="chatMain">
         <ChatHeader socket={socket} setShowProfile={setShowProfile} selectedUser={selectedUser} handleShowUser={handleShowUser} setSelectedUser={setSelectedUser}/> 
         {!showProfile && (

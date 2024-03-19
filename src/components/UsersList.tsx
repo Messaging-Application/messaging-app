@@ -133,7 +133,12 @@ const UsersList: React.FC<UsersListProps> = ({ setShowProfile, setSelectedUser, 
   
     return (
         <div className="chatSidebar">
-            <h2>CHAT APP</h2>
+            <img
+                className="mx-auto h-10 w-auto"
+                src="../../public/logo2.png"
+                alt="Hermes"
+                style={{ height: "60px", width: "auto", borderRadius: "5px"}}
+            />
             <div>
                 <h4 className="chatHeader">Users</h4>
                 <div className="chatUsers" style={{ maxHeight: "70vh", overflowY: "auto" }}>

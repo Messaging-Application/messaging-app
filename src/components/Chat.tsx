@@ -28,7 +28,7 @@ const Chat: React.FC<ChatProps> = ({ socket }) => {
         if (chatId) {
           try {
             console.log(chatId);
-              const response = await fetch(`http://ec2-35-158-93-2.eu-central-1.compute.amazonaws.com:8080/message/${chatId}`, {
+              const response = await fetch(`http://ec2-18-159-111-149.eu-central-1.compute.amazonaws.com:8080/message/${chatId}`, {
                   method: "GET",
                   credentials: "include", 
                   headers: { 
@@ -95,7 +95,7 @@ const Chat: React.FC<ChatProps> = ({ socket }) => {
 
   return (
     <div className="chat">
-      <UsersList setShowProfile={setShowProfile} setSelectedUser={setSelectedUser} handleShowUser={handleShowUser} setChatId={setChatId} socket={socket}/> 
+      <UsersList setShowProfile={setShowProfile} setSelectedUser={setSelectedUser} handleShowUser={handleShowUser} setChatId={setChatId}/> 
       <div className="chatMain">
         <ChatHeader socket={socket} setShowProfile={setShowProfile} selectedUser={selectedUser} handleShowUser={handleShowUser} setSelectedUser={setSelectedUser}/> 
         {!showProfile && (

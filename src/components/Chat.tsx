@@ -119,7 +119,7 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({ socket, setShowProfile, selecte
     axios.defaults.withCredentials = true;
     try {
       // Logout request
-      await axios.post('http://localhost:8080/auth/logout', {}, {
+      await axios.post('http://ec2-18-197-153-164.eu-central-1.compute.amazonaws.com:8080/auth/logout', {}, {
         withCredentials: true,
         headers: {
           'Content-Type': 'application/json',

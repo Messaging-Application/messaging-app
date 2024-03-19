@@ -40,7 +40,7 @@ const Login: React.FC = () => {
       // Make POST request to login endpoint
       try {
         const response: AxiosResponse = await axios.post(
-          'http://localhost:8080/auth/login',
+          'http://ec2-18-197-153-164.eu-central-1.compute.amazonaws.com:8080/auth/login',
           body,
           {
             withCredentials: true,

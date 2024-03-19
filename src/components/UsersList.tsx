@@ -66,7 +66,7 @@ const UsersList: React.FC<UsersListProps> = ({ setShowProfile, setSelectedUser, 
         const fetchUsers = async () => {
             try {
                 setIsLoading(true); // Set loading state to true
-                const response = await fetch(`http://localhost:8081/user/all?pageNo=${currentPage}&pageSize=${pageSize}`, {
+                const response = await fetch(`http://ec2-3-64-211-17.eu-central-1.compute.amazonaws.com:8080/user/all?pageNo=${currentPage}&pageSize=${pageSize}`, {
                     method: "GET",
                     credentials: "include", 
                     headers: { 

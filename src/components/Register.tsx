@@ -61,7 +61,7 @@ const Register: React.FC = () => {
         "firstName": firstname,
         "lastName": lastname
       };
-      fetch("http://localhost:8080/auth/register", {
+      fetch("http://ec2-18-197-153-164.eu-central-1.compute.amazonaws.com:8080/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),

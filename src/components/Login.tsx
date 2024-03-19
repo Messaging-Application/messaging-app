@@ -40,7 +40,7 @@ const Login: React.FC = () => {
       // Make POST request to login endpoint
       try {
         const response: AxiosResponse = await axios.post(
-          'http://ec2-18-197-153-164.eu-central-1.compute.amazonaws.com:8080/auth/login',
+          'http://ec2-18-192-107-219.eu-central-1.compute.amazonaws.com:8080/auth/login',
           body,
           {
             withCredentials: true,
@@ -56,6 +56,7 @@ const Login: React.FC = () => {
         setUser(response.data);
         localStorage.setItem('user', JSON.stringify(response.data));
         const cookie = getCookie('ChatApp');
+        console.log(cookie);
         if (cookie) {
           localStorage.setItem('jwt', cookie);
         }
@@ -71,14 +72,12 @@ const Login: React.FC = () => {
     <>
       <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-          <img
+        <img
             className="mx-auto h-10 w-auto"
-            src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
-            alt="Your Company"
+            src="../../public/logo.png"
+            alt="Hermes"
+            style={{ height: "100px", width: "auto" }}
           />
-          <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
-            Sign in to your account
-          </h2>
         </div>
 
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">

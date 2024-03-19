@@ -40,7 +40,6 @@ export interface UsersListProps {
   setSelectedUser: React.Dispatch<React.SetStateAction<UserData | null>>; 
   handleShowUser: (user: UserData | null) => void; 
   setChatId: React.Dispatch<React.SetStateAction<string>>;
-  socket: WebSocket;
 }
   
 export interface UserData {

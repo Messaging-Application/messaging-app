@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { UsersListProps, UserData, UserWithChatData } from "../types";
 import "../index.css";
 
-const UsersList: React.FC<UsersListProps> = ({ setShowProfile, setSelectedUser, handleShowUser, setChatId, socket }) => {
+const UsersList: React.FC<UsersListProps> = ({ setShowProfile, setSelectedUser, handleShowUser, setChatId }) => {
     // State variables
     const [users, setUsers] = useState<UserWithChatData[]>([]);
     const [currentPage, setCurrentPage] = useState(0);
@@ -12,56 +12,11 @@ const UsersList: React.FC<UsersListProps> = ({ setShowProfile, setSelectedUser, 
     const [totalPages, setTotalPages] = useState<number>(0);
     const [nextPage, setNextPage] = useState<boolean>(false);
     const pageSize : number = 3;
-    console.log(socket);
     const [isLoading, setIsLoading] = useState(false); // State to track loading state
     // Get user from local storage
     const userString = localStorage.getItem("user");
     const user: UserData | null = userString ? JSON.parse(userString) : null;    
-    // const [onlineUsers, setOnlineUsers] = useState([]);
-
-    // useEffect(() => {
-    //     console.log("!!!");
-    //     // Function to fetch online users
-    //     const fetchOnlineUsers = async () => {
-    //         console.log("!!");
-    //         try {
-    //             // Send a message to the WebSocket server indicating you want to fetch online users
-    //             if (socket.readyState === WebSocket.OPEN) {
-    //                 // Send a message to the WebSocket server indicating you want to fetch online users
-    //                 const msg = {
-    //                     "action" : "getOnlineUsers",
-    //                     "sender_id": String(user?.id)
-    //                 };
-    //                 socket.send(JSON.stringify(msg));
-    //             } else {
-    //                 console.log("WebSocket connection is still in CONNECTING state.");
-    //             }
-    //         } catch (err) {
-    //             console.log(err);
-    //         }
-    //     };
-    //     console.log("!!!!!");
-    //     fetchOnlineUsers();
-    //     // Set up an interval to fetch online users every 5 minutes (300000 milliseconds)
-    //     const interval = setInterval(() => {
-    //         fetchOnlineUsers();
-    //     }, 9999999999999999999999999999999999999999999999999999);
-
-    //     // Handle messages received from WebSocket server
-    //     socket.onmessage = (event) => {
-    //       console.log("-----", event.data);
-    //       const data = JSON.parse(event.data);
-    //       if (data.action === 'updateOnlineUsers') {
-    //         // Update online users state with data received from WebSocket server
-    //         setOnlineUsers(data.online_user_ids);
-    //       }
-    //     };
-    //     console.log(onlineUsers);
-    
-    //     // Clean up function to clear interval on component unmount
-    //     return () => clearInterval(interval);
-    // }, []); // Empty dependency array ensures useEffect runs only once after initial render
-    
+  
     useEffect(() => {
         const fetchUsers = async () => {
             try {
@@ -133,7 +88,12 @@ const UsersList: React.FC<UsersListProps> = ({ setShowProfile, setSelectedUser, 
   
     return (
         <div className="chatSidebar">
-            <h2>CHAT APP</h2>
+            <img
+                className="mx-auto h-10 w-auto"
+                src="../../public/logo2.png"
+                alt="Hermes"
+                style={{ height: "60px", width: "auto", borderRadius: "5px"}}
+            />
             <div>
                 <h4 className="chatHeader">Users</h4>
                 <div className="chatUsers" style={{ maxHeight: "70vh", overflowY: "auto" }}>

@@ -28,7 +28,7 @@ const Chat: React.FC<ChatProps> = ({ socket }) => {
         if (chatId) {
           try {
             console.log(chatId);
-              const response = await fetch(`http://ec2-35-158-93-2.eu-central-1.compute.amazonaws.com:8080/message/${chatId}`, {
+              const response = await fetch(`http://ec2-18-159-111-149.eu-central-1.compute.amazonaws.com:8080/message/${chatId}`, {
                   method: "GET",
                   credentials: "include", 
                   headers: { 
@@ -70,14 +70,7 @@ const Chat: React.FC<ChatProps> = ({ socket }) => {
   useEffect(() => {
     socket.onmessage = (event) => {
       const newMessage = JSON.parse(event.data);
-      // const userString = localStorage.getItem("user");
-      // if (userString) {
-      //   const userJson = JSON.parse(userString);
-      //   console.log("checking");
-      //   if ((newMessage.sender_id === String(userJson.id) && newMessage.receiver_id === String(selectedUser?.id)) || (newMessage.sender_id === String(selectedUser?.id) && newMessage.receiver_id === String(userJson.id))) {
           setMessages(prevMessages => [...prevMessages, newMessage]);
-        // }
-      // }
     };
   }, [socket, selectedUser]);
 
@@ -95,7 +88,7 @@ const Chat: React.FC<ChatProps> = ({ socket }) => {
 
   return (
     <div className="chat">
-      <UsersList setShowProfile={setShowProfile} setSelectedUser={setSelectedUser} handleShowUser={handleShowUser} setChatId={setChatId} socket={socket}/> 
+      <UsersList setShowProfile={setShowProfile} setSelectedUser={setSelectedUser} handleShowUser={handleShowUser} setChatId={setChatId}/> 
       <div className="chatMain">
         <ChatHeader socket={socket} setShowProfile={setShowProfile} selectedUser={selectedUser} handleShowUser={handleShowUser} setSelectedUser={setSelectedUser}/> 
         {!showProfile && (
@@ -119,7 +112,7 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({ socket, setShowProfile, selecte
     axios.defaults.withCredentials = true;
     try {
       // Logout request
-      await axios.post('http://ec2-18-197-153-164.eu-central-1.compute.amazonaws.com:8080/auth/logout', {}, {
+      await axios.post('http://ec2-18-192-107-219.eu-central-1.compute.amazonaws.com:8080/auth/logout', {}, {
         withCredentials: true,
         headers: {
           'Content-Type': 'application/json',

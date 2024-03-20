@@ -99,7 +99,7 @@ const Register: React.FC = () => {
         <img
             className="mx-auto h-10 w-auto"
             src="../../public/logo.png"
-            alt="ChatApp"
+            alt="Hermes"
             style={{ height: "100px", width: "auto" }}
           />
         </div>

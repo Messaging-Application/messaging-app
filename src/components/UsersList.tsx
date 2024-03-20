@@ -16,7 +16,7 @@ const UsersList: React.FC<UsersListProps> = ({ setShowProfile, setSelectedUser, 
     // Get user from local storage
     const userString = localStorage.getItem("user");
     const user: UserData | null = userString ? JSON.parse(userString) : null;    
-  
+
     useEffect(() => {
         const fetchUsers = async () => {
             try {

@@ -76,7 +76,7 @@ const Profile: React.FC<ProfileProps> = ({ showUser }) => {
     event.preventDefault();
     try {
       // Send DELETE request to delete user account
-      const response = await fetch("http://localhost:8081/user/delete/" + user?.id, {
+      const response = await fetch("http://ec2-3-64-211-17.eu-central-1.compute.amazonaws.com:8080/user/delete/" + user?.id, {
         method: 'DELETE',
         credentials: "include", 
         headers: {
@@ -129,7 +129,7 @@ const Profile: React.FC<ProfileProps> = ({ showUser }) => {
         "firstName": firstname,
         "lastName": lastname
       };
-      fetch("http://localhost:8081/user/edit/" + user?.id, {
+      fetch("http://ec2-3-64-211-17.eu-central-1.compute.amazonaws.com:8080/user/edit/" + user?.id, {
         method: "PATCH",
         credentials: "include", 
         headers: { 

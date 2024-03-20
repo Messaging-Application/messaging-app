@@ -40,7 +40,7 @@ const Login: React.FC = () => {
       // Make POST request to login endpoint
       try {
         const response: AxiosResponse = await axios.post(
-          'http://localhost:8080/auth/login',
+          'http://ec2-18-192-107-219.eu-central-1.compute.amazonaws.com:8080/auth/login',
           body,
           {
             withCredentials: true,
@@ -56,6 +56,7 @@ const Login: React.FC = () => {
         setUser(response.data);
         localStorage.setItem('user', JSON.stringify(response.data));
         const cookie = getCookie('ChatApp');
+        console.log(cookie);
         if (cookie) {
           localStorage.setItem('jwt', cookie);
         }
@@ -71,10 +72,10 @@ const Login: React.FC = () => {
     <>
       <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-          <img
+        <img
             className="mx-auto h-10 w-auto"
             src="../../public/logo.png"
-            alt="ChatApp"
+            alt="Hermes"
             style={{ height: "100px", width: "auto" }}
           />
         </div>

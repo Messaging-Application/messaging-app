@@ -61,7 +61,7 @@ const Register: React.FC = () => {
         "firstName": firstname,
         "lastName": lastname
       };
-      fetch("http://localhost:8080/auth/register", {
+      fetch("http://ec2-18-192-107-219.eu-central-1.compute.amazonaws.com:8080/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
@@ -96,7 +96,7 @@ const Register: React.FC = () => {
     <>
       <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-          <img
+        <img
             className="mx-auto h-10 w-auto"
             src="../../public/logo.png"
             alt="Hermes"

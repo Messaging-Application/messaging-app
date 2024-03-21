@@ -94,7 +94,7 @@ const Profile: React.FC<ProfileProps> = ({ showUser }) => {
           localStorage.removeItem('jwt');
           setUser(null);
         }
-        window.location.reload();
+        window.location.href = "/";
       } else {
         // Handle error response
         setSuccessMessage("");

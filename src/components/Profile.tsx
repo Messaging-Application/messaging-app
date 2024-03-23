@@ -92,7 +92,6 @@ const Profile: React.FC<ProfileProps> = ({ showUser }) => {
         if (!(currentUser?.roles.includes("ROLE_ADMIN") && showUser && typeof showUser === 'object')) {
           localStorage.removeItem('user');
           localStorage.removeItem('jwt');
-          socket.close();
           setUser(null);
         }
         window.location.href = "/";
